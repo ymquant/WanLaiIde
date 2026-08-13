@@ -1,0 +1,10 @@
+<svg width="24" height="24" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Generated from ../wanlaiide.svg (sha256: 9f988cae885a7615c4611a46f008629fc2e349462746c50c68be4a6242012abf). Do not edit. -->
+  <g fill="currentColor">
+<rect x="512" y="124" width="108" height="108" transform="rotate(45 512 124)"/>
+    <rect x="356" y="280" width="108" height="108" transform="rotate(45 356 280)"/>
+    <rect x="668" y="280" width="108" height="108" transform="rotate(45 668 280)"/>
+    <rect x="512" y="748" width="108" height="108" transform="rotate(45 512 748)"/>
+    <path d="M202 437L358 593L514 437L670 593L826 437L903 515L670 748L514 592L358 748L125 515L202 437Z"/>
+  </g>
+</svg>
