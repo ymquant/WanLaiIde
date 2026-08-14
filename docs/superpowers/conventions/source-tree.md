@@ -1,46 +1,58 @@
-# Continue 源码树：首期保留与可裁剪
+# Continue 源码树：保留与裁剪原则
 
-本仓库基于 continue `v2.0.0-vscode` 做 VS Code AI Agent 插件。**删除任何上游目录或文件前必须先询问维护者**（见 `.cursor/rules/no-delete-without-asking.mdc`）。下文是建议，不是已执行的删除。
+本仓库基于 continue `v2.0.0-vscode`。**删除前必须询问维护者**（见 `.cursor/rules/no-delete-without-asking.mdc`）。
 
-VS Code 插件运行时：扩展宿主进程内加载 `core`，Webview 加载 `gui`。不经过 `binary/`。
+## 原则（已确认）
 
-## 建议保留（第一期插件必需）
+1. **不要**因为「第一期用不到」就删。
+2. 打包、构建、流水线、测试、评测、CLI、JetBrains、索引等，**只要将来可能用到就保留**。
+3. 只删除对万来 **现在和将来都不可能有用**（或会把流程指到 Continue 官方、造成误导）的内容。
+4. 删掉后若要从上游再取回，成本高——存疑则留。
 
-| 路径 | 作用 |
-|------|------|
-| `extensions/vscode/` | VS Code 扩展入口、命令、Webview 宿主 |
-| `gui/` | Agent / Chat / Cmd+K 界面 |
-| `core/` | 会话、模型、工具、配置（与编辑器解耦） |
-| `packages/config-yaml`、`config-types`、`openai-adapters`、`fetch`、`llm-info`、`terminal-security` | core 的 `file:` 依赖 |
-| `assets/brand/` | 万来品牌源文件 |
-| `docs/superpowers/` | 万来设计、计划、本规范 |
-| `LICENSE` | Apache 2.0，fork 必须保留 |
-| 根 `package.json`、`package-lock.json`、`.nvmrc`、`.vscode/` | 安装与 Launch extension |
+VS Code 运行时：扩展宿主加载 `core`，Webview 加载 `gui`。不经过 `binary/`（`binary/` 给 JetBrains 等用，仍保留）。
 
-## 建议不纳入产品、可考虑日后删除（须确认）
+## 必须保留
 
-| 路径 | 是什么 | 为何可裁 | 注意 |
-|------|--------|----------|------|
-| `docs-site/` | Continue 官方文档站（Next.js，约等于 docs.continue.dev） | 插件运行、打包都不引用 | 与 `docs/` 里的 MDX 是两套；删站点不等于删 `docs/` |
-| `docs/` 下 Continue 的 MDX 文档 | 上游产品文档 | 不做 Continue 文档站则不需要 `docs` 的 `npm install` | **`docs/superpowers/` 在同一棵 `docs/` 下，禁止整目录删除 `docs/`** |
-| `extensions/intellij/` | JetBrains 插件 | 首期只做 VS Code | 删除后需改安装/CI 里对 intellij 的引用 |
-| `extensions/cli/` | Continue CLI（`cn`） | 不是 VS Code 扩展 | 与 vscode 构建独立 |
-| `binary/` | 独立 Node 进程，通过 IPC/TCP 跑 `Core`，供 JetBrains 等连接 | VS Code 在扩展进程内 `new Core(...)`，不启动该进程 | `scripts/install-dependencies.ps1` 会 `cd binary && npm install && npm run build`；若保留脚本则暂留目录，或先改脚本再删 |
-| `eval/` | 模型/检索评测 | 不做评测流水线则不需要 | |
-| `manual-testing-sandbox/` | 上游手工测试样例工程 | 不参与构建 | |
-| `sync/` | Rust Merkle 代码索引库 | VS Code 索引主要在 `core/` TypeScript；安装脚本里 cargo 已注释 | 与 JetBrains/binary 关系更近，首期可不编译 |
-| `.github/workflows/` 上游工作流 | Continue 自己的 CI/发版 | 会指向 Continue 的 marketplace/文档站 | 替换为万来 CI 前不要当自己的流水线用 |
-| `docs-search-dark-mode-fix.png`、`.claude/`、`skills/` | 上游杂项/技能包 | 与 VS Code 扩展运行无关 | 逐项确认 |
+| 路径                                                                                                 | 作用                      |
+| ---------------------------------------------------------------------------------------------------- | ------------------------- |
+| `extensions/vscode/`、`gui/`、`core/`                                                                | VS Code 插件主路径        |
+| `packages/*`（含 config-yaml、openai-adapters、fetch、llm-info、terminal-security、continue-sdk 等） | 依赖与可复用包            |
+| `assets/brand/`、`docs/superpowers/`                                                                 | 万来品牌与设计/规范       |
+| `LICENSE`                                                                                            | Apache 2.0，fork 必须保留 |
+| 根 `package.json`、`package-lock.json`、`.nvmrc`、`.vscode/`、`scripts/`                             | 安装、调试、构建          |
+| `BUILD_DEPENDENCIES.md`、`TESTING.md`                                                                | 构建与测试说明            |
 
-## `binary/` 补充说明
+## 暂留（第一期可能不用，将来可能用）
 
-`binary/src/index.ts` 把 `IS_BINARY=true`，创建 `IpcMessenger` 或开发用 `TcpMessenger`，再 `new Core(messenger, ide)`。IntelliJ 的 “Start Core Dev Server” 工作目录就是 `binary/`。
+| 路径                                                                  | 为何留                                                                                     |
+| --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `extensions/intellij/`、`binary/`                                     | 将来做 JetBrains / 独立 Core 进程                                                          |
+| `extensions/cli/`                                                     | 将来做 CLI                                                                                 |
+| `sync/`                                                               | 代码索引（Rust），评测/增强可能用到                                                        |
+| `manual-testing-sandbox/`                                             | 手工测 Agent / Edit / Next Edit 的样例工程                                                 |
+| `eval/`                                                               | 评测脚手架（即使目前几乎为空）                                                             |
+| `skills/`、`actions/`、`.claude/`                                     | Agent skill、PR review Action、文档风格 skill，流水线/协作可参考                           |
+| `.github/workflows/*`（除已删的 CLA/docs-pages）、`.github/actions/*` | VSIX 构建、E2E、发版、依赖图等流水线模板；多数带 `continuedev/continue` 门禁，启用前需改编 |
+| `.continue/`、`worktree-config.yaml`                                  | 仓库内开发辅助、worktree 拷贝配置                                                          |
+| `.idea/`                                                              | JetBrains 运行配置参考                                                                     |
 
-这不是「编译出来的 exe 资源目录」，而是 **给非 VS Code 宿主用的 Core 守护进程**。只做 VS Code 插件时，运行时不需要它。
+## 已删除（对万来不可能有用 / 会误导）
 
-## 建议的裁剪顺序（仍须确认后再动）
+| 路径                                                       | 原因                                               |
+| ---------------------------------------------------------- | -------------------------------------------------- |
+| Continue Mintlify `docs/` 内容（已清，仅留 `superpowers`） | 官方文档站与演示图，插件与自有文档不依赖           |
+| `docs-search-dark-mode-form.png`                           | 同上                                               |
+| `CLA.md`、`.github/workflows/cla.yaml`                     | 向 **Continue Dev, Inc.** 授权的 CLA，万来不会沿用 |
+| `.github/CODEOWNERS`                                       | 指向 `@continuedev/...`，在本仓库只会误派审查      |
+| `.github/ISSUE_TEMPLATE/config.yml`                        | 联系链接指向 continuedev Discussions               |
+| `.github/workflows/docs-gh-pages.yml`                      | 部署已移除的 Continue 文档站                       |
 
-1. 安装时跳过 `docs`、`docs-site`、`binary` 的 npm（改脚本也要先问）。
-2. 确认后从版本库移除：`docs-site/`、`extensions/intellij/`、`extensions/cli/`、`eval/`、`manual-testing-sandbox/`。
-3. `binary/` 与安装脚本一起改，避免半删导致 `install-dependencies.ps1` 失败。
-4. Continue 的 `docs/*.mdx` 若删除，必须保住 `docs/superpowers/`。
+## 仍保留、但基线后建议改写（不删）
+
+- 根 `README.md`：Continue 营销文案，可改成万来说明
+- 多数 `.github/workflows`：保留作 CI 模板，去掉 `if: github.repository == 'continuedev/continue'` 并改密钥/发版目标后再启用
+- `SECURITY.md` / `CODE_OF_CONDUCT.md`：可改成万来联系方式与社区规范
+
+## 安装脚本注意
+
+`scripts/install-dependencies.ps1` 仍可能 `cd docs` / `cd binary` 装依赖。`docs` 文档站已去掉后，**docs 安装段应跳过或删除**（改脚本前先问维护者）。`binary` 建议保留安装，除非明确放弃 JetBrains。
