@@ -1,0 +1,19 @@
+---
+description: 禁止未经用户确认删除文件或目录
+alwaysApply: true
+---
+
+# 删除须先询问
+
+AI **不得**删除文件、目录，也不得用清空内容的方式变相删除，除非用户在本轮对话中明确点名要删的路径。
+
+「暂且用不到」「减小仓库」「continue 上游有」都不是删除许可。先在对话里列出路径、用途、建议（保留 / 暂留不安装 / 确认后删除），等用户确认后再改工作区。
+
+删减 Continue 上游目录时，还要说明对 `scripts/install-dependencies.ps1`、`.vscode/tasks.json` 的影响，不得 silently 改安装脚本。
+
+```text
+❌ BAD: 直接删 docs-site/、binary/、extensions/intellij
+✅ GOOD: 「docs-site 是 Continue 文档站，VS Code 插件运行不依赖它。是否从仓库移除？确认后我再改文件，git 仍由你操作。」
+```
+
+对照：`docs/superpowers/conventions/source-tree.md`

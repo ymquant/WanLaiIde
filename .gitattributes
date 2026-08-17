@@ -1,0 +1,28 @@
+# 所有源代码文本文件，仓库强制存LF
+*.rs      text eol=lf
+*.ts      text eol=lf
+*.tsx     text eol=lf
+*.js      text eol=lf
+*.jsx     text eol=lf
+*.json    text eol=lf
+*.md      text eol=lf
+*.yml     text eol=lf
+*.yaml    text eol=lf
+*.toml    text eol=lf
+*.gitignore text eol=lf
+*.css     text eol=lf
+*.html    text eol=lf
+
+# shell脚本必须LF（Windows WSL/GitBash、Mac/Linux运行）
+*.sh      text eol=lf
+
+# Windows批处理脚本才用CRLF
+*.bat     text eol=crlf
+*.cmd     text eol=crlf
+
+# 二进制文件，禁止换行转换
+*.png     binary
+*.jpg     binary
+*.gif     binary
+*.pdf     binary
+*.vsix    binary

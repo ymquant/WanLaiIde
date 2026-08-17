@@ -1,0 +1,25 @@
+---
+description: 禁止 AI 自动执行 git；提交由维护者按仓库规范亲自操作
+alwaysApply: true
+---
+
+# Git 由维护者本人操作
+
+AI **不得**自动执行任何 git 写操作：`add`、`commit`、`reset`、`checkout`、`switch`、`merge`、`rebase`、`cherry-pick`、`stash`、`tag`、`push`、`pull`、`fetch`、删分支、`git config`、改 hook。禁止 `git add -A`。
+
+只读 `status` / `diff` / `log` 仅用于核对工作区。规范全文：`docs/superpowers/conventions/git.md`。
+
+## 完成任务时必须交付
+
+1. 做了什么
+2. 建议检查
+3. 建议暂存的**具体路径**（不要 `add -A`）
+4. 建议分支名：`<type>/<snake_case>`（当前鉴权分支为 `feat/oauth_login`）
+5. 建议 message：`<type>(<scope>): <中文 subject>`
+
+「实现完」不等于授权提交。
+
+```text
+❌ BAD: git add -A && git commit -m "chore: import continue"
+✅ GOOD: 建议暂存 .gitignore 与 docs/superpowers/conventions/；建议 message：docs(continue): 补充 git 规范与源码裁剪说明
+```

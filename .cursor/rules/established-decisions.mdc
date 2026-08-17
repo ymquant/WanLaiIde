@@ -1,0 +1,21 @@
+---
+description: 不得擅自改动已确定的命名、设定与文档结论
+alwaysApply: true
+---
+
+# 已定命名与设定
+
+下列内容视为已锁定，AI 不得自行改名、改值、改目录或「顺便对齐」：
+
+- 分支名（当前鉴权工作分支锁定为 `feat/oauth_login`）、扩展 id、命令前缀、配置键（如 `wanlaiide.*`）
+- `client_id`、产品名、API/站点默认地址
+- 设计文档与计划里已确认的决策（含「第一期保持 continue 目录」「npm 不切 pnpm」）
+- 用户已经起好的文件名、规则名、issue 标题用语
+
+若认为不合理：先提出理由和备选，**等用户确认后再改**。用户确认后也由用户本人做 git 相关操作。
+
+```text
+❌ BAD: 把 feat/oauth_login 自行改成 feat/oauth-login
+❌ BAD: 把计划里的 client_id 改成自认为更对的值
+✅ GOOD: 「建议将 X 改为 Y，原因是…；确认后我只改文件，提交由你来做」
+```
