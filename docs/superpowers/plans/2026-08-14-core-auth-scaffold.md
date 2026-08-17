@@ -27,41 +27,49 @@
 - 品牌 SVG 源文件：`assets/brand/wanlaiide.svg`
 - 默认 `apiBaseUrl`：`https://api.wanlai.ai/v1`；`siteBaseUrl`：`https://wanlai.ai`
 
+
+
 ## File map
 
-| 路径 | 职责 |
-|------|------|
-| `core/ports/*.ts` | SecretStorage / HTTP / Logger / CallbackServer 接口 |
-| `core/auth/pkce.ts` | PKCE + timing-safe state |
-| `core/auth/eventEmitter.ts` | 不依赖 vscode 的订阅器 |
-| `core/auth/types.ts` | 凭据、状态、blob 类型 |
-| `core/auth/errorMapper.ts` | 四种错误结构 + 凭据类型分流 |
-| `core/auth/sanitizedLogger.ts` | 四层脱敏 |
-| `core/auth/credentialStore.ts` | 单 blob、代次、single-flight 刷新 |
-| `core/auth/oauthApiClient.ts` | token / profile / create_api_key |
-| `core/auth/runtimeApiClient.ts` | 仅 `getModels`（可选 smokeChat） |
-| `core/auth/authService.ts` | 登录编排、restore、validateSession |
-| `core/auth/requestCanceller.ts` | in-flight AbortController 集合 |
-| `core/config/profile/WanLaiProfileLoader.ts` | 内存 profile，注入 models + headers |
-| `core/config/ConfigHandler.ts` | 小改：允许注册并优先选中万来 profile |
-| `extensions/vscode/src/auth/*.ts` | OAuth 回调 server、SecretStorage/HTTP 适配、deviceInfo、组装 |
-| `extensions/vscode/src/activation/activate.ts` | 激活时先 restore，不阻塞网络 |
-| `extensions/vscode/package.json` | 扩展标识、`wanlaiide.*` 配置、登录命令 |
-| `gui/src/components/AuthStatusBadge.tsx` | 登录态展示 |
+
+| 路径                                             | 职责                                                  |
+| ---------------------------------------------- | --------------------------------------------------- |
+| `core/ports/*.ts`                              | SecretStorage / HTTP / Logger / CallbackServer 接口   |
+| `core/auth/pkce.ts`                            | PKCE + timing-safe state                            |
+| `core/auth/eventEmitter.ts`                    | 不依赖 vscode 的订阅器                                     |
+| `core/auth/types.ts`                           | 凭据、状态、blob 类型                                       |
+| `core/auth/errorMapper.ts`                     | 四种错误结构 + 凭据类型分流                                     |
+| `core/auth/sanitizedLogger.ts`                 | 四层脱敏                                                |
+| `core/auth/credentialStore.ts`                 | 单 blob、代次、single-flight 刷新                          |
+| `core/auth/oauthApiClient.ts`                  | token / profile / create_api_key                    |
+| `core/auth/runtimeApiClient.ts`                | 仅 `getModels`（可选 smokeChat）                         |
+| `core/auth/authService.ts`                     | 登录编排、restore、validateSession                        |
+| `core/auth/requestCanceller.ts`                | in-flight AbortController 集合                        |
+| `core/config/profile/WanLaiProfileLoader.ts`   | 内存 profile，注入 models + headers                      |
+| `core/config/ConfigHandler.ts`                 | 小改：允许注册并优先选中万来 profile                              |
+| `extensions/vscode/src/auth/*.ts`              | OAuth 回调 server、SecretStorage/HTTP 适配、deviceInfo、组装 |
+| `extensions/vscode/src/activation/activate.ts` | 激活时先 restore，不阻塞网络                                  |
+| `extensions/vscode/package.json`               | 扩展标识、`wanlaiide.*` 配置、登录命令                          |
+| `gui/src/components/AuthStatusBadge.tsx`       | 登录态展示                                               |
+
 
 ---
+
+
 
 ### Task 1: 导入 continue v2.0.0-vscode 并确认能启动
 
 **Files:**
+
 - Create/overwrite: continue 源树（根 `LICENSE`、`core/`、`gui/`、`extensions/`、`packages/`、`scripts/` 等）
 - Keep: `assets/brand/`、`docs/superpowers/`
 
 **Interfaces:**
+
 - Consumes: 无
 - Produces: 可在本机 `npm` 安装依赖，并用 VS Code 任务 `Launch extension` 打开 Extension Development Host
 
-- [ ] **Step 1: 确认 Node 版本**
+- [x] **Step 1: 确认 Node 版本**
 
 Run:
 
@@ -71,7 +79,7 @@ node -v
 
 Expected: `v20.20.1` 或更高。若低于此版本，先安装 Node 20 LTS 再继续。
 
-- [ ] **Step 2: 把 continue 标签合入仓库（不覆盖万来文档与品牌）**
+- [x] **Step 2: 把 continue 标签合入仓库（不覆盖万来文档与品牌）**
 
 在仓库根目录 `C:\Users\1\Desktop\WanLaiIde` 执行：
 
@@ -89,7 +97,7 @@ Test-Path .\LICENSE
 
 Expected: 两个 `Test-Path` 为 `True`；`LICENSE` 存在且内容为 Apache 2.0。robocopy 退出码 `0–7` 都算成功。
 
-- [ ] **Step 3: 安装依赖**
+- [x] **Step 3: 安装依赖**
 
 ```powershell
 npm i -g vite
@@ -105,13 +113,13 @@ Set-Location gui; npm install; Set-Location ..
 Set-Location extensions\vscode; npm install; Set-Location ..\..
 ```
 
-- [ ] **Step 4: 用 VS Code 启动扩展**
+- [x] **Step 4: 用 VS Code 启动扩展**
 
 在 Cursor/VS Code 中：Run and Debug → `Launch extension`（continue 自带的 launch 配置）。应打开 Extension Development Host，侧边栏出现 Continue 图标。
 
 若 Host 无法激活：看 Debug Console 错误，修到能激活为止，本任务不改品牌、不加 auth。
 
-- [ ] **Step 5: 确认 .gitignore 后再暂存、提交**
+- [x] **Step 5: 确认 .gitignore 后再暂存、提交**
 
 禁止上来就 `git add -A`。continue 的忽略规则不能覆盖万来新增目录，二次开发后目录会和上游不完全一样。
 
@@ -130,7 +138,7 @@ git diff --cached --name-only | Select-String -Pattern 'node_modules|\.env$|secr
 
 最后一条必须没有输出。若有命中，先 `git reset` 对应路径并补 `.gitignore`，不要提交。
 
-4. 再提交(提交前需向开发者请求确认)：
+1. 再提交(提交前需向开发者请求确认)：
 
 ```powershell
 git commit -m "chore(bootstrap): import continue v2.0.0-vscode as WanLai IDE baseline"
@@ -138,14 +146,18 @@ git commit -m "chore(bootstrap): import continue v2.0.0-vscode as WanLai IDE bas
 
 ---
 
+
+
 ### Task 2: 轻量换皮（标识与图标，不改目录）
 
 **Files:**
+
 - Modify: `extensions/vscode/package.json`（`name`、`publisher`、`displayName`、`description`、`icon`）
 - Create: `extensions/vscode/media/icon.png`（由 `assets/brand/wanlaiide.svg` 导出 128×128 PNG）
 - Modify: 仅当 launch/tasks 里写死了 `Continue` 扩展 id 时，改成新 id
 
 **Interfaces:**
+
 - Consumes: Task 1 可启动的扩展
 - Produces: 扩展 id `wanlaiide.wanlaiide`（若 publisher 尚未注册 marketplace，开发宿主仍可用；id 必须与命令前缀一致）
 
@@ -155,7 +167,7 @@ git commit -m "chore(bootstrap): import continue v2.0.0-vscode as WanLai IDE bas
 
 用 PowerShell + 已安装的工具生成 128 PNG。若没有转换器，先把 SVG 放到 `extensions/vscode/media/icon.svg` 并在本任务注释「图标 PNG 待导出」，但 `package.json` `icon` 字段 continue 需要 png——则用 Sharp/无依赖方案：不要为图标引入新生产依赖。开发阶段可暂时继续用 continue 的 `media/icon.png`，另存一份 `media/wanlaiide.svg` 拷贝，等有转换器再替换。**本任务必须改显示名，图标能换则换，不能换则留下 SVG 拷贝并在 PR 说明。**
 
-- [ ] **Step 2: 改 `extensions/vscode/package.json` 标识**
+- [ ] **Step 2: 改** `extensions/vscode/package.json` **标识**
 
 将下列字段改为：
 
@@ -216,9 +228,12 @@ git commit -m "chore: rebrand VS Code extension metadata to WanLai IDE"
 
 ---
 
+
+
 ### Task 3: core ports、事件器、PKCE
 
 **Files:**
+
 - Create: `core/ports/secretStoragePort.ts`
 - Create: `core/ports/httpClientPort.ts`
 - Create: `core/ports/loggerPort.ts`
@@ -230,10 +245,11 @@ git commit -m "chore: rebrand VS Code extension metadata to WanLai IDE"
 - Test: `core/auth/pkce.vitest.ts`
 
 **Interfaces:**
+
 - Consumes: 无
 - Produces: 见下方完整类型，后续 Task 必须原样使用这些名字
 
-- [ ] **Step 1: 写失败的 PKCE 测试**
+- [x] **Step 1: 写失败的 PKCE 测试**
 
 Create `core/auth/pkce.vitest.ts`:
 
@@ -257,7 +273,7 @@ describe("pkce", () => {
 });
 ```
 
-- [ ] **Step 2: 跑测试，确认失败**
+- [x] **Step 2: 跑测试，确认失败**
 
 ```powershell
 Set-Location core
@@ -266,7 +282,7 @@ npx vitest run auth/pkce.vitest.ts
 
 Expected: FAIL，模块找不到。
 
-- [ ] **Step 3: 实现 ports 与 PKCE**
+- [x] **Step 3: 实现 ports 与 PKCE**
 
 `core/ports/secretStoragePort.ts`:
 
@@ -402,7 +418,7 @@ export class RequestCanceller {
 
 `core/auth/pkce.ts`：按 spec 3.5 实现 `createOAuthAttempt` 与 `statesEqual`。
 
-- [ ] **Step 4: 再跑 PKCE 测试**
+- [x] **Step 4: 再跑 PKCE 测试**
 
 ```powershell
 Set-Location core
@@ -420,19 +436,23 @@ git commit -m "feat: add auth ports, PKCE, and in-process event helpers"
 
 ---
 
+
+
 ### Task 4: errorMapper 与 sanitizedLogger
 
 **Files:**
+
 - Create: `core/auth/errorMapper.ts`
 - Create: `core/auth/sanitizedLogger.ts`
 - Test: `core/auth/errorMapper.vitest.ts`
 - Test: `core/auth/sanitizedLogger.vitest.ts`
 
 **Interfaces:**
+
 - Consumes: `LoggerPort`
 - Produces: `parseError`、`getErrorAction`、`StructuredError`、`ErrorAction`、`SanitizedLogger`
 
-- [ ] **Step 1: 写失败测试**
+- [x] **Step 1: 写失败测试**
 
 `core/auth/errorMapper.vitest.ts` 必须覆盖：
 
@@ -445,14 +465,14 @@ git commit -m "feat: add auth ports, PKCE, and in-process event helpers"
 
 `core/auth/sanitizedLogger.vitest.ts`：用内存 delegate 断言 `access_token`、`Bearer eyJ`、`sk-abc`、`code_verifier` 被替换成 `***`，普通句子不变。
 
-- [ ] **Step 2: 跑测试确认失败**
+- [x] **Step 2: 跑测试确认失败**
 
 ```powershell
 Set-Location core
 npx vitest run auth/errorMapper.vitest.ts auth/sanitizedLogger.vitest.ts
 ```
 
-- [ ] **Step 3: 实现**
+- [x] **Step 3: 实现**
 
 `errorMapper.ts` 按 spec 6.7：`parseError(source, status, body)` 分别读 `body.reason`、`body.error.sub_code`、`body.error.code`。`getErrorAction` 先看 reason 表，再看 `credentialKind === "runtime" && statusCode === 401`。
 
@@ -467,13 +487,17 @@ git commit -m "feat: add auth error mapping and log sanitization"
 
 ---
 
+
+
 ### Task 5: CredentialStore
 
 **Files:**
+
 - Create: `core/auth/credentialStore.ts`
 - Test: `core/auth/credentialStore.vitest.ts`
 
 **Interfaces:**
+
 - Consumes: `SecretStoragePort`、`OAuthApiClient.refreshToken`（本任务用 fake client）、`LoggerPort`
 - Produces: `CredentialStore` 方法：`restore`、`getValidAccessToken`、`getRuntimeApiKey`、`saveLogin`、`saveRuntimeApiKey`、`clear`、`reloadFromStorage`、`getCredentials`
 
@@ -489,7 +513,7 @@ git commit -m "feat: add auth error mapping and log sanitization"
 
 不要在构造函数里直接 `new OAuthApiClient`。
 
-- [ ] **Step 1: 写失败测试（内存 FakeStorage）**
+- [x] **Step 1: 写失败测试（内存 FakeStorage）**
 
 FakeStorage：`Map<string,string>` 实现 `SecretStoragePort`。
 
@@ -504,14 +528,14 @@ FakeStorage：`Map<string,string>` 实现 `SecretStoragePort`。
 7. `saveLogin` 过程中有 in-flight refresh：refresh 结束后不得覆盖新登录（revision）
 8. `reloadFromStorage` 用外部写入的新 blob 覆盖内存
 
-- [ ] **Step 2: 跑测试确认失败**
+- [x] **Step 2: 跑测试确认失败**
 
 ```powershell
 Set-Location core
 npx vitest run auth/credentialStore.vitest.ts
 ```
 
-- [ ] **Step 3: 实现 CredentialStore**
+- [x] **Step 3: 实现 CredentialStore**
 
 过期缓冲：`expiresAt - Date.now() <= 60_000` 视为需要刷新。
 
@@ -528,15 +552,19 @@ git commit -m "feat: add atomic credential blob store with single-flight refresh
 
 ---
 
+
+
 ### Task 6: OAuth 与 Runtime API client
 
 **Files:**
+
 - Create: `core/auth/oauthApiClient.ts`
 - Create: `core/auth/runtimeApiClient.ts`
 - Test: `core/auth/oauthApiClient.vitest.ts`
 - Test: `core/auth/runtimeApiClient.vitest.ts`
 
 **Interfaces:**
+
 - Consumes: `HttpClientPort`、`OAuthClientConfig`、`getAccessToken` / `getRuntimeApiKey`、`DeviceInfo`、`parseError`
 - Produces: `exchangeCode`、`refreshToken`、`getProfile`、`createRuntimeApiKey`、`getModels`
 
@@ -579,13 +607,17 @@ git commit -m "feat: add WanLai OAuth and models API clients"
 
 ---
 
+
+
 ### Task 7: AuthService
 
 **Files:**
+
 - Create: `core/auth/authService.ts`
 - Test: `core/auth/authService.vitest.ts`
 
 **Interfaces:**
+
 - Consumes: `CredentialStore`、`OAuthApiClient`、`RuntimeApiClient`（仅 create key 走 oauth）、`LoginDeps`、`RequestCanceller`、`LoggerPort`
 - Produces: `login`、`logout`、`restoreFromStorage`、`validateSession`、`getStatus`、`getPublicUserInfo`、`onStatusChange`
 
@@ -634,9 +666,12 @@ git commit -m "feat: add AuthService login, restore, and session validation"
 
 ---
 
+
+
 ### Task 8: VS Code 适配器 + 激活接线（不含模型注入）
 
 **Files:**
+
 - Create: `extensions/vscode/src/auth/oauthServer.ts`
 - Create: `extensions/vscode/src/auth/secretStorageAdapter.ts`
 - Create: `extensions/vscode/src/auth/httpClientAdapter.ts`
@@ -645,11 +680,11 @@ git commit -m "feat: add AuthService login, restore, and session validation"
 - Create: `extensions/vscode/src/auth/createAuthModule.ts`
 - Modify: `extensions/vscode/src/activation/activate.ts`
 - Modify: `extensions/vscode/src/extension/VsCodeExtension.ts`（若命令注册在此，则在此注册 login/logout）
-- Test: `extensions/vscode/src/auth/oauthServer.vitest.ts` 或放在 core 侧无法测 listen 的，用 node 测试文件。continue 扩展侧未必跑 vitest——**OAuth server 用 `core` 无法测绑定地址时，在 `extensions/vscode` 写一个可 `npx vitest` 的小测试，或用 node:http 的集成断言写在 `core` 外的 `extensions/vscode/src/auth/oauthServer.test.ts` 并用 `npx tsx` 跑。优先：把 server 实现保持无 vscode 依赖，测试文件放 `extensions/vscode/src/auth/oauthServer.vitest.ts`，从该目录跑 `npx vitest`（若无配置，把纯逻辑测放到 Task 8 的手动：用 `curl` 打 callback）。**
+- Test: `extensions/vscode/src/auth/oauthServer.vitest.ts` 或放在 core 侧无法测 listen 的，用 node 测试文件。continue 扩展侧未必跑 vitest——**OAuth server 用** `core` **无法测绑定地址时，在** `extensions/vscode` **写一个可** `npx vitest` **的小测试，或用 node:http 的集成断言写在** `core` **外的** `extensions/vscode/src/auth/oauthServer.test.ts` **并用** `npx tsx` **跑。优先：把 server 实现保持无 vscode 依赖，测试文件放** `extensions/vscode/src/auth/oauthServer.vitest.ts`**，从该目录跑** `npx vitest`**（若无配置，把纯逻辑测放到 Task 8 的手动：用** `curl` **打 callback）。**
 
 为降低工具摩擦：`OAuthCallbackServer` 只依赖 `node:http`，把文件放在 `core/auth/oauthServer.ts` 实现 `CallbackServerPort`，extension 只 re-export。这样可用 vitest。
 
-**更正（按分层）：** spec 把 server 放在 extension，因为它用 `node:http`。core 可以用 `node:http`（continue core 已是 Node）。**把 `OAuthCallbackServer` 放 `core/auth/oauthServer.ts`**，extension 的 `createCallbackServer: () => new OAuthCallbackServer()`。这样不违反「core 不 import vscode」。
+**更正（按分层）：** spec 把 server 放在 extension，因为它用 `node:http`。core 可以用 `node:http`（continue core 已是 Node）。**把** `OAuthCallbackServer` **放** `core/auth/oauthServer.ts`，extension 的 `createCallbackServer: () => new OAuthCallbackServer()`。这样不违反「core 不 import vscode」。
 
 - [ ] **Step 1: 写 oauthServer 的 vitest**
 
@@ -733,15 +768,19 @@ git commit -m "feat: wire WanLai OAuth login into the VS Code extension host"
 
 ---
 
+
+
 ### Task 9: WanLaiProfileLoader 注入 ConfigHandler
 
 **Files:**
+
 - Create: `core/config/profile/WanLaiProfileLoader.ts`
 - Modify: `core/config/ConfigHandler.ts`（增加 `registerWanLaiProfile` + `loadProfiles` 时插入并优先选中）
 - Create: `extensions/vscode/src/auth/wanLaiConfigBridge.ts`
 - Modify: `extensions/vscode/src/extension/VsCodeExtension.ts`（Core 创建后 attach）
 
 **Interfaces:**
+
 - Consumes: `AuthService.getStatus`、`getRuntimeApiKey`、`RuntimeApiClient.getModels`、`ConfigHandler.reloadConfig` / `onConfigUpdate`
 - Produces: 已登录有套餐时 continue `models[]` 含万来模型，`apiKey` 仅内存，`requestOptions.headers` 含 `X-Wanlai-*`
 
@@ -825,14 +864,18 @@ git commit -m "feat: inject WanLai models into Continue config from auth session
 
 ---
 
+
+
 ### Task 10: GUI 登录态与消息协议
 
 **Files:**
+
 - Create: `gui/src/components/AuthStatusBadge.tsx`
 - Modify: continue GUI 顶栏/侧边栏布局文件（fork 后定位实际 header 组件，例如 `gui/src/components/mainInput` 旁或 `gui/src/pages` 的 chat 页顶部）
 - Modify: `extensions/vscode` 的 webview protocol 发送侧（`ContinueGUIWebviewViewProvider` 或 `VsCodeMessenger`）
 
 **Interfaces:**
+
 - Consumes: `auth:status` / `auth:login` / `auth:logout` / `auth:get_status`
 - Produces: 脱敏邮箱、开通套餐按钮、不传 uuid/token
 
@@ -869,9 +912,12 @@ git commit -m "feat: show WanLai auth status in the chat sidebar"
 
 ---
 
+
+
 ### Task 11: 用 continue Chat 做真实对话验证 + 安全检查
 
 **Files:**
+
 - Modify: 仅当 continue 发模型请求未带上 `requestOptions.headers` 时，修 `core/llm` 对应 fetch 包装（先证实，再改；不要预先 fork provider）
 - Create: `docs/superpowers/specs/2026-08-14-auth-manual-qa.md`（把 spec 12.3 清单抄过去并勾选说明）
 
@@ -911,25 +957,29 @@ git commit -m "test: verify WanLai auth session, chat path, and secret hygiene"
 
 ---
 
+
+
 ## Self-review
 
 **Spec coverage:**
 
-| spec 要求 | 任务 |
-|-----------|------|
-| 导入 continue + LICENSE | Task 1 |
-| 不改目录 / npm | Task 1–2 |
-| 换皮 | Task 2 |
-| PKCE、ports | Task 3 |
-| 错误分流、脱敏 | Task 4 |
-| 单 blob 凭据 | Task 5 |
-| client_id 统一、models client | Task 6 |
-| restore/validate/二次登录 | Task 7 |
-| 回调 server、激活不阻塞、onDidChange | Task 8 |
-| ConfigHandler 注入、headers | Task 9 |
-| Webview 协议与无套餐 UX | Task 10 |
-| Chat 真通、断网不清登录 | Task 11 |
-| 自写 SSE / 重命名 packages | 明确不做 |
+
+| spec 要求                     | 任务       |
+| --------------------------- | -------- |
+| 导入 continue + LICENSE       | Task 1   |
+| 不改目录 / npm                  | Task 1–2 |
+| 换皮                          | Task 2   |
+| PKCE、ports                  | Task 3   |
+| 错误分流、脱敏                     | Task 4   |
+| 单 blob 凭据                   | Task 5   |
+| client_id 统一、models client  | Task 6   |
+| restore/validate/二次登录       | Task 7   |
+| 回调 server、激活不阻塞、onDidChange | Task 8   |
+| ConfigHandler 注入、headers    | Task 9   |
+| Webview 协议与无套餐 UX           | Task 10  |
+| Chat 真通、断网不清登录              | Task 11  |
+| 自写 SSE / 重命名 packages       | 明确不做     |
+
 
 **Placeholder scan:** Task 2 图标若无法转 PNG 允许暂缓，不影响鉴权。Task 9 必须先读 LocalProfileLoader 再写，接口名以 fork 代码为准。
 

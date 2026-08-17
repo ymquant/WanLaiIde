@@ -104,6 +104,9 @@ export function createEditorConfig(options: {
   const availableSlashCommandsRef = useUpdatingRef(
     props.availableSlashCommands,
   );
+  // useEditor keyboard shortcuts capture the first onEnter; keep a live ref.
+  const onEnterPropRef = useRef(props.onEnter);
+  onEnterPropRef.current = props.onEnter;
   const { prevRef, nextRef, addRef } = useInputHistory(props.historyKey);
 
   const enterSubmenu = async (editor: Editor, providerId: string) => {
@@ -406,7 +409,7 @@ export function createEditorConfig(options: {
       addRef.current(json);
     }
 
-    props.onEnter(json, modifiers, editor);
+    onEnterPropRef.current(json, modifiers, editor);
   };
 
   return { editor, onEnter };

@@ -4,6 +4,7 @@ import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { CustomScrollbarDiv } from ".";
 import { AuthProvider } from "../context/Auth";
+import { WanLaiAuthProvider } from "../context/WanLaiAuth";
 import { IdeMessengerContext } from "../context/IdeMessenger";
 import { LocalStorageProvider } from "../context/LocalStorage";
 import { useWebviewListener } from "../hooks/useWebviewListener";
@@ -197,35 +198,37 @@ const Layout = () => {
   return (
     <LocalStorageProvider>
       <AuthProvider>
-        <LayoutTopDiv>
-          <OSRContextMenu />
-          <div
-            style={{
-              scrollbarGutter: "stable both-edges",
-              minHeight: "100%",
-              display: "grid",
-              gridTemplateRows: "1fr auto",
-            }}
-          >
-            <TextDialog
-              showDialog={showDialog}
-              onEnter={() => {
-                dispatch(setShowDialog(false));
+        <WanLaiAuthProvider>
+          <LayoutTopDiv>
+            <OSRContextMenu />
+            <div
+              style={{
+                scrollbarGutter: "stable both-edges",
+                minHeight: "100%",
+                display: "grid",
+                gridTemplateRows: "1fr auto",
               }}
-              onClose={() => {
-                dispatch(setShowDialog(false));
-              }}
-              message={dialogMessage}
-            />
+            >
+              <TextDialog
+                showDialog={showDialog}
+                onEnter={() => {
+                  dispatch(setShowDialog(false));
+                }}
+                onClose={() => {
+                  dispatch(setShowDialog(false));
+                }}
+                message={dialogMessage}
+              />
 
-            <GridDiv>
-              <Outlet />
-              {/* The fatal error for chat is shown below input */}
-              {!isHome && <FatalErrorIndicator />}
-            </GridDiv>
-          </div>
-          <div style={{ fontSize: fontSize(-4) }} id="tooltip-portal-div" />
-        </LayoutTopDiv>
+              <GridDiv>
+                <Outlet />
+                {/* The fatal error for chat is shown below input */}
+                {!isHome && <FatalErrorIndicator />}
+              </GridDiv>
+            </div>
+            <div style={{ fontSize: fontSize(-4) }} id="tooltip-portal-div" />
+          </LayoutTopDiv>
+        </WanLaiAuthProvider>
       </AuthProvider>
     </LocalStorageProvider>
   );

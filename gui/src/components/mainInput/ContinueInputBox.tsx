@@ -29,6 +29,9 @@ interface ContinueInputBoxProps {
   appliedRules?: RuleMetadata[];
   hidden?: boolean;
   inputId: string; // used to keep track of things per input in redux
+  /** When true, disable the send button (auth gate). Enter still notifies why. */
+  sendDisabled?: boolean;
+  sendDisabledReason?: string;
 }
 
 const EDIT_DISALLOWED_CONTEXT_PROVIDERS = [
@@ -133,6 +136,8 @@ function ContinueInputBox(props: ContinueInputBoxProps) {
             historyKey={historyKey}
             toolbarOptions={toolbarOptions}
             inputId={props.inputId}
+            sendDisabled={props.sendDisabled}
+            sendDisabledReason={props.sendDisabledReason}
           />
         </GradientBorder>
       </div>

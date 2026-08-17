@@ -46,10 +46,12 @@ import { ToolCallDiv } from "./ToolCallDiv";
 import { useStore } from "react-redux";
 import FeedbackDialog from "../../components/dialogs/FeedbackDialog";
 
+import { AuthStatusBadge } from "../../components/AuthStatusBadge";
 import { DeprecationBanner } from "../../components/DeprecationBanner";
 import { FatalErrorIndicator } from "../../components/config/FatalErrorNotice";
 import InlineErrorMessage from "../../components/mainInput/InlineErrorMessage";
 import { resolveEditorContent } from "../../components/mainInput/TipTapEditor/utils/resolveEditorContent";
+import { useWanLaiAuth } from "../../context/WanLaiAuth";
 import { setDialogMessage, setShowDialog } from "../../redux/slices/uiSlice";
 import { RootState } from "../../redux/store";
 import { cancelStream } from "../../redux/thunks/cancelStream";
@@ -130,6 +132,10 @@ export function Chat() {
   const jetbrains = useMemo(() => {
     return isJetBrains();
   }, []);
+  const { canSendChat, notifyChatBlocked, chatBlockReason, showBanner } =
+    useWanLaiAuth();
+  const sendGateRef = useRef({ canSendChat, notifyChatBlocked, showBanner });
+  sendGateRef.current = { canSendChat, notifyChatBlocked, showBanner };
 
   useAutoScroll(stepsDivRef, history);
 
@@ -164,6 +170,14 @@ export function Chat() {
       index?: number,
       editorToClearOnSend?: Editor,
     ) => {
+      // Gate on WanLai auth — never clear history; only block new sends.
+      // Read from ref so TipTap's first-render Enter handler sees latest status.
+      const gate = sendGateRef.current;
+      if (!gate.canSendChat) {
+        gate.notifyChatBlocked();
+        return;
+      }
+
       const stateSnapshot = reduxStore.getState();
       const latestPendingToolCalls = selectPendingToolCalls(stateSnapshot);
       const latestPendingApplyStates = selectDoneApplyStates(stateSnapshot);
@@ -193,6 +207,10 @@ export function Chat() {
         : selectedModelByRole.chat;
 
       if (!model) {
+        gate.showBanner(
+          "当前没有可用模型，暂时无法发送。请稍候或重新登录后再试。",
+          "info",
+        );
         return;
       }
 
@@ -381,6 +399,7 @@ export function Chat() {
 
   return (
     <>
+      <AuthStatusBadge />
       {!!showSessionTabs && !isInEdit && <TabBar ref={tabsRef} />}
       {widget}
 
@@ -419,6 +438,8 @@ export function Chat() {
             sendInput(editorState, modifiers, undefined, editor)
           }
           inputId={MAIN_EDITOR_INPUT_ID}
+          sendDisabled={!canSendChat}
+          sendDisabledReason={chatBlockReason ?? undefined}
         />
 
         <div

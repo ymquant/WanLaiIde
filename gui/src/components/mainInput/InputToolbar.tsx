@@ -43,6 +43,7 @@ interface InputToolbarProps {
   activeKey: string | null;
   toolbarOptions?: ToolbarOptions;
   disabled?: boolean;
+  disabledReason?: string;
   isMainInput?: boolean;
 }
 
@@ -221,7 +222,14 @@ function InputToolbar(props: InputToolbarProps) {
               </span>
             </HoverItem>
           )}
-          <ToolTip place="top" content="Send (⏎)">
+          <ToolTip
+            place="top"
+            content={
+              props.disabled && props.disabledReason
+                ? props.disabledReason
+                : "Send (⏎)"
+            }
+          >
             <Button
               variant={props.isMainInput ? "primary" : "secondary"}
               size="sm"

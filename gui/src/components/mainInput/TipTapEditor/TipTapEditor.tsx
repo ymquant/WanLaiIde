@@ -41,6 +41,8 @@ export interface TipTapEditorProps {
   // TODO: This isn't actually used anywhere in this component, but it appears
   // to be pulled into some of our TipTap extensions.
   inputId: string;
+  sendDisabled?: boolean;
+  sendDisabledReason?: string;
 }
 
 export const TIPPY_DIV_ID = "tippy-js-div";
@@ -296,7 +298,8 @@ function TipTapEditorInner(props: TipTapEditorProps) {
               }
             });
           }}
-          disabled={isStreaming}
+          disabled={isStreaming || !!props.sendDisabled}
+          disabledReason={props.sendDisabledReason}
         />
       </div>
 
