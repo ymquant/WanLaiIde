@@ -22,7 +22,7 @@ export interface AuthServiceDeps {
 }
 
 function hasActiveEntitlement(profile: ProfileResponse): boolean {
-  return profile.entitlement != null && profile.entitlement.status === "active";
+  return profile.entitlement?.status === "active";
 }
 
 export class AuthService {

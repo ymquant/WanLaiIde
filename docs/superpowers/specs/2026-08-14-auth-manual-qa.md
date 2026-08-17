@@ -30,8 +30,6 @@
 - [ ] `~/.continue/config.yaml` 无 runtime apiKey
 - [ ] 断网 / 5xx 不导致 extension host 崩溃
 
-
-
 ## 自动化已覆盖（无需在 Host 重测）
 
 在 `core/` 下：

@@ -51,8 +51,9 @@ class FakeStorage implements SecretStoragePort {
 class FakeHttp implements HttpClientPort {
   requestCount = 0;
   requests: HttpRequestOptions[] = [];
-  handlers: Array<(opts: HttpRequestOptions) => Promise<HttpResponse> | HttpResponse> =
-    [];
+  handlers: Array<
+    (opts: HttpRequestOptions) => Promise<HttpResponse> | HttpResponse
+  > = [];
 
   async request(options: HttpRequestOptions): Promise<HttpResponse> {
     this.requestCount++;
@@ -90,7 +91,9 @@ class FakeCallbackServer implements CallbackServerPort {
   close(): void {
     if (this.closed) return;
     this.closed = true;
-    this.rejectResult(Object.assign(new Error("LoginCancelled"), { name: "LoginCancelled" }));
+    this.rejectResult(
+      Object.assign(new Error("LoginCancelled"), { name: "LoginCancelled" }),
+    );
   }
 
   complete(state: string): void {

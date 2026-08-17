@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import type { HttpClientPort, HttpRequestOptions, HttpResponse } from "../ports/httpClientPort.js";
+import type {
+  HttpClientPort,
+  HttpRequestOptions,
+  HttpResponse,
+} from "../ports/httpClientPort.js";
 import { OAuthApiClient } from "./oauthApiClient.js";
 import { DEFAULT_CLIENT_ID, type OAuthClientConfig } from "./types.js";
 
@@ -43,7 +47,11 @@ describe("OAuthApiClient", () => {
       getAccessToken: async () => "should-not-use",
     });
 
-    await client.exchangeCode("auth-code", "verifier-1", "http://127.0.0.1:49152/callback");
+    await client.exchangeCode(
+      "auth-code",
+      "verifier-1",
+      "http://127.0.0.1:49152/callback",
+    );
 
     expect(http.lastRequest).toBeDefined();
     expect(http.lastRequest!.method).toBe("POST");
@@ -70,7 +78,11 @@ describe("OAuthApiClient", () => {
     });
 
     const before = Date.now();
-    const tokens = await client.exchangeCode("c", "v", "http://127.0.0.1:1/callback");
+    const tokens = await client.exchangeCode(
+      "c",
+      "v",
+      "http://127.0.0.1:1/callback",
+    );
     const after = Date.now();
 
     expect(tokens.accessToken).toBe("access-xyz");
@@ -123,8 +135,12 @@ describe("OAuthApiClient", () => {
     const profile = await client.getProfile();
 
     expect(http.lastRequest!.method).toBe("GET");
-    expect(http.lastRequest!.url).toBe("https://api.wanlai.ai/api/oauth/profile");
-    expect(http.lastRequest!.headers?.Authorization).toBe("Bearer access-secret");
+    expect(http.lastRequest!.url).toBe(
+      "https://api.wanlai.ai/api/oauth/profile",
+    );
+    expect(http.lastRequest!.headers?.Authorization).toBe(
+      "Bearer access-secret",
+    );
     expect(http.lastRequest!.timeoutMs).toBe(15_000);
     expect(profile.account.display_name).toBe("Ada");
   });
@@ -147,7 +163,9 @@ describe("OAuthApiClient", () => {
     expect(http.lastRequest!.url).toBe(
       "https://api.wanlai.ai/api/oauth/wanlaicode/create_api_key",
     );
-    expect(http.lastRequest!.headers?.Authorization).toBe("Bearer access-secret");
+    expect(http.lastRequest!.headers?.Authorization).toBe(
+      "Bearer access-secret",
+    );
     expect(key).toBe("sk-runtime-1");
   });
 

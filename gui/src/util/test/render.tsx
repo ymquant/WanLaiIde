@@ -7,6 +7,7 @@ import { MemoryRouter, RouterProps } from "react-router-dom";
 import { MainEditorProvider } from "../../components/mainInput/TipTapEditor";
 import { AuthProvider } from "../../context/Auth";
 import { IdeMessengerProvider } from "../../context/IdeMessenger";
+import { WanLaiAuthProvider } from "../../context/WanLaiAuth";
 import { MockIdeMessenger } from "../../context/MockIdeMessenger";
 import ParallelListeners from "../../hooks/ParallelListeners";
 import { setupStore } from "../../redux/store";
@@ -52,10 +53,12 @@ export async function renderWithProviders(
       <IdeMessengerProvider messenger={ideMessenger}>
         <Provider store={store}>
           <AuthProvider>
-            <MainEditorProvider>
-              {children}
-              <ParallelListeners />
-            </MainEditorProvider>
+            <WanLaiAuthProvider>
+              <MainEditorProvider>
+                {children}
+                <ParallelListeners />
+              </MainEditorProvider>
+            </WanLaiAuthProvider>
           </AuthProvider>
         </Provider>
       </IdeMessengerProvider>

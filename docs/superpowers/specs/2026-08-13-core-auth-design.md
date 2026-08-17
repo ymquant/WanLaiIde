@@ -6,9 +6,9 @@
 
 ### 变更记录
 
-| 版本 | 日期 | 变更 |
-|------|------|------|
-| v1.0 | 2026-08-13 | 初稿 |
+| 版本 | 日期       | 变更                                                                                                                                                                                                                                                                                                |
+| ---- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| v1.0 | 2026-08-13 | 初稿                                                                                                                                                                                                                                                                                                |
 | v1.1 | 2026-08-14 | 统一 `client_id`；凭据改为单 blob 原子写入；启动恢复不得因网络失败清登录；运行 Key 与 OAuth 的 401 分流；保持 continue 目录与 npm；用 ConfigHandler 内存 profile 注入模型，不另建聊天 HTTP 栈；补齐 ports / 取消注册中心；多窗口改用 `SecretStorage.onDidChange`；PKCE 下沉到 core；保留 Apache 2.0 |
 
 ---
@@ -69,28 +69,28 @@
 
 ## 2. 已确认决策汇总
 
-| 决策项 | 结论 | 说明 |
-|--------|------|------|
-| 基础代码 | 导入 continue `v2.0.0-vscode` | 标签是 VS Code 扩展 2.0.0 稳定版；第一阶段需 Agent + Cmd+K |
-| 许可证 | 保留 continue 的 Apache 2.0 | 衍生代码必须保留 `LICENSE` 与版权声明；bootstrap「暂不添加许可证」不覆盖 fork 文件 |
-| 目录布局 | 第一期保持 continue 原布局 | `extensions/vscode`、`core/`、`gui/`、`packages/*`；不对齐 bootstrap 的 `packages/extension` |
-| 裁剪范围 | 可删除 `extensions/intellij`；autocomplete/Hub 保留但不启用；config-yaml 保留但禁用编辑入口 | 第一期不重排 monorepo |
-| 认证方式 | OAuth 2.0 Authorization Code + PKCE，系统浏览器登录 | 不在 WebView 收集密码 |
-| OAuth 回调 | 本地 HTTP Server（127.0.0.1 随机端口） | 不需要后端改 redirect_uri |
-| HTTP 客户端 | 原生 `fetch` + `AbortController` | continue 要求 Node `>=20.20.1` |
-| 凭据存储 | `vscode.SecretStorage` **单个 JSON blob** | 一次 `store` 原子替换整组凭据，避免四 key 写到一半 |
-| 模型注入 | 内存 Profile / ConfigHandler overlay | continue 2.0 **没有** `ContinueConfigProvider` 接口；不写 `config.yaml` 中的 apiKey |
-| 对话路径 | 复用 continue LLM（OpenAI 兼容 provider） | 用 `apiKey` + `requestOptions.headers` 注入；不另建 `chatCompletion` 产品路径 |
-| 品牌地址 | API_BASE = `https://api.wanlai.ai/v1`，SITE_BASE = `https://wanlai.ai` | 万来品牌 |
-| 客户端标识 | 授权、换票、刷新全部使用 `client_id=wanlaicode-cli` | 参考值，后续替换；禁止混用 `wanlai-ide` |
-| 登录超时 | 15 分钟 | 对接文档建议上限 |
-| 邮箱展示 | 脱敏展示，格式 `u***@example.com` | 保留首字符和域名 |
-| 无套餐处理 | 聊天入口不禁用，显示「开通套餐」按钮；发消息返回柔和提示 | 开通按钮跳转 `https://wanlai.ai/purchase` |
-| 登录中关闭 Webview | 登录状态全局化，与 Webview 生命周期解耦；后台完成 + 系统通知 | AuthService 是 extension host 单例 |
-| 多窗口同步 | SecretStorage 为唯一真相源 + `onDidChange` + 窗口聚焦兜底 | VS Code 的 `SecretStorage.onDidChange` 会跨窗口触发 |
-| 设备 ID | `SHA256("wanlaiide:" + vscode.env.machineId)` → base64url → 取前 32 字符 | 不使用硬件序列号原文 |
-| 包管理 | npm（与 continue 2.0.0 一致） | 第一期不切 pnpm |
-| 测试 | vitest（core 单元测试）+ `@vscode/test-electron`（extension 集成测试） | continue core 已有 vitest/jest；新增 auth 测试用 vitest |
+| 决策项             | 结论                                                                                        | 说明                                                                                         |
+| ------------------ | ------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| 基础代码           | 导入 continue `v2.0.0-vscode`                                                               | 标签是 VS Code 扩展 2.0.0 稳定版；第一阶段需 Agent + Cmd+K                                   |
+| 许可证             | 保留 continue 的 Apache 2.0                                                                 | 衍生代码必须保留 `LICENSE` 与版权声明；bootstrap「暂不添加许可证」不覆盖 fork 文件           |
+| 目录布局           | 第一期保持 continue 原布局                                                                  | `extensions/vscode`、`core/`、`gui/`、`packages/*`；不对齐 bootstrap 的 `packages/extension` |
+| 裁剪范围           | 可删除 `extensions/intellij`；autocomplete/Hub 保留但不启用；config-yaml 保留但禁用编辑入口 | 第一期不重排 monorepo                                                                        |
+| 认证方式           | OAuth 2.0 Authorization Code + PKCE，系统浏览器登录                                         | 不在 WebView 收集密码                                                                        |
+| OAuth 回调         | 本地 HTTP Server（127.0.0.1 随机端口）                                                      | 不需要后端改 redirect_uri                                                                    |
+| HTTP 客户端        | 原生 `fetch` + `AbortController`                                                            | continue 要求 Node `>=20.20.1`                                                               |
+| 凭据存储           | `vscode.SecretStorage` **单个 JSON blob**                                                   | 一次 `store` 原子替换整组凭据，避免四 key 写到一半                                           |
+| 模型注入           | 内存 Profile / ConfigHandler overlay                                                        | continue 2.0 **没有** `ContinueConfigProvider` 接口；不写 `config.yaml` 中的 apiKey          |
+| 对话路径           | 复用 continue LLM（OpenAI 兼容 provider）                                                   | 用 `apiKey` + `requestOptions.headers` 注入；不另建 `chatCompletion` 产品路径                |
+| 品牌地址           | API_BASE = `https://api.wanlai.ai/v1`，SITE_BASE = `https://wanlai.ai`                      | 万来品牌                                                                                     |
+| 客户端标识         | 授权、换票、刷新全部使用 `client_id=wanlaicode-cli`                                         | 参考值，后续替换；禁止混用 `wanlai-ide`                                                      |
+| 登录超时           | 15 分钟                                                                                     | 对接文档建议上限                                                                             |
+| 邮箱展示           | 脱敏展示，格式 `u***@example.com`                                                           | 保留首字符和域名                                                                             |
+| 无套餐处理         | 聊天入口不禁用，显示「开通套餐」按钮；发消息返回柔和提示                                    | 开通按钮跳转 `https://wanlai.ai/purchase`                                                    |
+| 登录中关闭 Webview | 登录状态全局化，与 Webview 生命周期解耦；后台完成 + 系统通知                                | AuthService 是 extension host 单例                                                           |
+| 多窗口同步         | SecretStorage 为唯一真相源 + `onDidChange` + 窗口聚焦兜底                                   | VS Code 的 `SecretStorage.onDidChange` 会跨窗口触发                                          |
+| 设备 ID            | `SHA256("wanlaiide:" + vscode.env.machineId)` → base64url → 取前 32 字符                    | 不使用硬件序列号原文                                                                         |
+| 包管理             | npm（与 continue 2.0.0 一致）                                                               | 第一期不切 pnpm                                                                              |
+| 测试               | vitest（core 单元测试）+ `@vscode/test-electron`（extension 集成测试）                      | continue core 已有 vitest/jest；新增 auth 测试用 vitest                                      |
 
 ---
 
@@ -100,11 +100,11 @@
 
 ### 3.1 三类凭据（不能混用）
 
-| 凭据 | 来源 | 用途 | 不应用于 |
-|------|------|------|---------|
-| 用户 JWT | `/api/v1/auth/login` | 用户中心 REST API | 模型网关、软件 OAuth Profile |
-| 软件 OAuth Token | `/v1/oauth/token` | Profile、刷新 Token、创建运行 Key | 直接作为普通模型 API Key；不能拿去调 `/v1/chat/completions` |
-| 运行 API Key | `/api/oauth/wanlaicode/create_api_key` | `/v1/models`、`/v1/responses`、`/v1/chat/completions` | 用户中心 REST API、OAuth Profile |
+| 凭据             | 来源                                   | 用途                                                  | 不应用于                                                    |
+| ---------------- | -------------------------------------- | ----------------------------------------------------- | ----------------------------------------------------------- |
+| 用户 JWT         | `/api/v1/auth/login`                   | 用户中心 REST API                                     | 模型网关、软件 OAuth Profile                                |
+| 软件 OAuth Token | `/v1/oauth/token`                      | Profile、刷新 Token、创建运行 Key                     | 直接作为普通模型 API Key；不能拿去调 `/v1/chat/completions` |
+| 运行 API Key     | `/api/oauth/wanlaicode/create_api_key` | `/v1/models`、`/v1/responses`、`/v1/chat/completions` | 用户中心 REST API、OAuth Profile                            |
 
 运行 API 的 401 与 OAuth 的 401 必须分流处理，见 3.14 与 9.4。
 
@@ -151,13 +151,18 @@
 import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 
 function base64url(input: Buffer): string {
-  return input.toString("base64")
-    .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  return input
+    .toString("base64")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "");
 }
 
 export function createOAuthAttempt() {
   const codeVerifier = base64url(randomBytes(32));
-  const codeChallenge = base64url(createHash("sha256").update(codeVerifier).digest());
+  const codeChallenge = base64url(
+    createHash("sha256").update(codeVerifier).digest(),
+  );
   const state = base64url(randomBytes(32));
   return { codeVerifier, codeChallenge, state };
 }
@@ -186,6 +191,7 @@ export function statesEqual(expected: string, actual: string): boolean {
 - POST `{API_ORIGIN}/v1/oauth/token`
 - Content-Type: `application/json`
 - Body（`client_id` 必须与授权页相同）：
+
 ```json
 {
   "grant_type": "authorization_code",
@@ -195,9 +201,11 @@ export function statesEqual(expected: string, actual: string): boolean {
   "code_verifier": "..."
 }
 ```
+
 - 公开端点，不携带用户 JWT 或运行 API Key
 - `redirect_uri` 必须与授权请求里的值逐字节相同
 - 成功响应为 OAuth 裸 JSON（不带 `{code,message,data}` envelope）：
+
 ```json
 {
   "access_token": "eyJ...",
@@ -215,6 +223,7 @@ export function statesEqual(expected: string, actual: string): boolean {
 - GET `{API_ORIGIN}/api/oauth/profile`
 - Authorization: `Bearer {SOFTWARE_OAUTH_ACCESS_TOKEN}`
 - 成功响应裸 JSON：
+
 ```json
 {
   "account": {
@@ -240,6 +249,7 @@ export function statesEqual(expected: string, actual: string): boolean {
   }
 }
 ```
+
 - `entitlement` 可能为空：登录仍然成功，但客户端必须禁止模型运行并展示购买/开通入口；不要把「无套餐」误判为「登录失败」
 - 有套餐的判定：`entitlement != null && entitlement.status === "active"`。不要用 `product_code` 字符串硬匹配
 
@@ -255,6 +265,7 @@ export function statesEqual(expected: string, actual: string): boolean {
 
 - POST `{API_ORIGIN}/v1/oauth/token`
 - Body：
+
 ```json
 {
   "grant_type": "refresh_token",
@@ -263,6 +274,7 @@ export function statesEqual(expected: string, actual: string): boolean {
   "scope": "user:profile user:inference"
 }
 ```
+
 - 服务端可能轮换 refresh_token。成功后必须 **一次写入** SecretStorage blob，替换 `accessToken + refreshToken + expiresAt`；**默认保留**现有 `runtimeApiKey`（OAuth 轮换不等于运行 Key 失效）
 - 同一时刻只允许一个刷新任务（single-flight）
 - 刷新完成写入前检查内存凭据代次，旧刷新不得覆盖用户刚完成的新登录/登出
@@ -299,35 +311,36 @@ export function statesEqual(expected: string, actual: string): boolean {
 
 按 **调用所用的凭据类型** 解释 401，不能一律刷新 OAuth。
 
-| Reason/状态 | 发生在 | 客户端动作 |
-|------------|--------|-----------|
-| `TOKEN_EXPIRED`、OAuth Access Token 临近过期 | OAuth / Profile | 刷新 OAuth Token 后重试一次 |
-| `SOFTWARE_OAUTH_ACCESS_TOKEN_INVALID` | OAuth / Profile | 尝试 Refresh Token；失败则重新登录 |
-| `SOFTWARE_OAUTH_REFRESH_TOKEN_INVALID` | OAuth 刷新 | 清除登录态并重新登录 |
+| Reason/状态                                                                                   | 发生在                         | 客户端动作                                                                   |
+| --------------------------------------------------------------------------------------------- | ------------------------------ | ---------------------------------------------------------------------------- |
+| `TOKEN_EXPIRED`、OAuth Access Token 临近过期                                                  | OAuth / Profile                | 刷新 OAuth Token 后重试一次                                                  |
+| `SOFTWARE_OAUTH_ACCESS_TOKEN_INVALID`                                                         | OAuth / Profile                | 尝试 Refresh Token；失败则重新登录                                           |
+| `SOFTWARE_OAUTH_REFRESH_TOKEN_INVALID`                                                        | OAuth 刷新                     | 清除登录态并重新登录                                                         |
 | 运行 Key 无效 / 撤销（401 且 reason 指向 api key，或 Chat `error.code` 表示 invalid api key） | `/v1/models`、chat/completions | **不刷新 OAuth**；若 OAuth 仍有效则重建运行 Key 后重试一次；否则提示重新登录 |
-| `SOFTWARE_PRODUCT_NOT_ENTITLED` | 任意 | 保留登录态，禁止推理，展示开通套餐入口 |
-| `SOFTWARE_OAUTH_NO_USABLE_GROUP` | 任意 | 保留登录态，提示套餐暂不可用 |
-| `SOFTWARE_TOKEN_LIMIT_5H_EXCEEDED` | 模型 | 展示 5 小时额度用尽 |
-| `SOFTWARE_TOKEN_LIMIT_7D_EXCEEDED` | 模型 | 展示 7 天额度用尽 |
-| `SOFTWARE_TOKEN_LIMIT_30D_EXCEEDED` | 模型 | 展示 30 天额度用尽 |
-| `SOFTWARE_TOKEN_LIMIT_TOTAL_EXCEEDED` | 模型 | 展示试用总额度用尽/升级入口 |
-| `SOFTWARE_TOKEN_LIMIT_DEEPSEEK_DAILY_EXCEEDED` | 模型 | 展示 DeepSeek 当日额度用尽 |
-| HTTP 429 | 任意 | 按服务端语义展示额度或限速；仅限速类做退避重试 |
-| HTTP 500/502/503 | 任意 | 有上限的指数退避；**不得** clear 登录态 |
-| 网络错误（断网、DNS、超时） | 任意 | 保留登录态与用户输入；提示稍后重试 |
-| continue 流式 `response.failed` | 模型流 | 结束当前流并展示流内错误（由 continue 处理） |
+| `SOFTWARE_PRODUCT_NOT_ENTITLED`                                                               | 任意                           | 保留登录态，禁止推理，展示开通套餐入口                                       |
+| `SOFTWARE_OAUTH_NO_USABLE_GROUP`                                                              | 任意                           | 保留登录态，提示套餐暂不可用                                                 |
+| `SOFTWARE_TOKEN_LIMIT_5H_EXCEEDED`                                                            | 模型                           | 展示 5 小时额度用尽                                                          |
+| `SOFTWARE_TOKEN_LIMIT_7D_EXCEEDED`                                                            | 模型                           | 展示 7 天额度用尽                                                            |
+| `SOFTWARE_TOKEN_LIMIT_30D_EXCEEDED`                                                           | 模型                           | 展示 30 天额度用尽                                                           |
+| `SOFTWARE_TOKEN_LIMIT_TOTAL_EXCEEDED`                                                         | 模型                           | 展示试用总额度用尽/升级入口                                                  |
+| `SOFTWARE_TOKEN_LIMIT_DEEPSEEK_DAILY_EXCEEDED`                                                | 模型                           | 展示 DeepSeek 当日额度用尽                                                   |
+| HTTP 429                                                                                      | 任意                           | 按服务端语义展示额度或限速；仅限速类做退避重试                               |
+| HTTP 500/502/503                                                                              | 任意                           | 有上限的指数退避；**不得** clear 登录态                                      |
+| 网络错误（断网、DNS、超时）                                                                   | 任意                           | 保留登录态与用户输入；提示稍后重试                                           |
+| continue 流式 `response.failed`                                                               | 模型流                         | 结束当前流并展示流内错误（由 continue 处理）                                 |
 
 ### 3.15 重试、超时和退出登录建议值
 
-| 操作 | 超时 | 重试 |
-|------|------|------|
-| OAuth 浏览器登录 | 15 分钟 | 用户主动重新发起 |
-| OAuth Token/Profile | 15 秒 | 网络/5xx 最多 2 次，指数退避 |
-| 模型列表 | 15 秒 | 网络/5xx 最多 2 次 |
-| 建立聊天流 | 60 秒首包超时 | 交给 continue；未收到任何响应体时可有限重试 |
-| 流已开始 | 由用户取消或服务端结束 | 不自动重放 |
+| 操作                | 超时                   | 重试                                        |
+| ------------------- | ---------------------- | ------------------------------------------- |
+| OAuth 浏览器登录    | 15 分钟                | 用户主动重新发起                            |
+| OAuth Token/Profile | 15 秒                  | 网络/5xx 最多 2 次，指数退避                |
+| 模型列表            | 15 秒                  | 网络/5xx 最多 2 次                          |
+| 建立聊天流          | 60 秒首包超时          | 交给 continue；未收到任何响应体时可有限重试 |
+| 流已开始            | 由用户取消或服务端结束 | 不自动重放                                  |
 
 退出登录时：
+
 1. 通过 `RequestCanceller` 取消正在进行的刷新、profile、models 请求（continue 侧的模型流走其现有 abort）
 2. 增加本地凭据代次，使旧异步任务无法回写
 3. 删除 SecretStorage 中的凭据 blob
@@ -506,7 +519,9 @@ export interface OAuthCallbackResult {
 }
 
 export interface CallbackServerPort {
-  start(timeoutMs: number): Promise<{ port: number; result: Promise<OAuthCallbackResult> }>;
+  start(
+    timeoutMs: number,
+  ): Promise<{ port: number; result: Promise<OAuthCallbackResult> }>;
   close(): void;
 }
 
@@ -533,6 +548,7 @@ core 内事件用自写 `AuthEventEmitter<T>`（`subscribe` / `fire`），**禁�
 职责：生成 code_verifier、code_challenge、state；常量时间校验 state。实现见 3.5。
 
 约束：
+
 - `codeVerifier` 和 `state` 只存本次登录的内存变量，完成或失败后丢弃
 - 不落盘、不进日志、不进 SecretStorage
 - `codeChallenge` 使用 S256
@@ -543,18 +559,23 @@ core 内事件用自写 `AuthEventEmitter<T>`（`subscribe` / `fire`），**禁�
 
 ```typescript
 export class OAuthCallbackServer implements CallbackServerPort {
-  async start(timeoutMs = 15 * 60 * 1000): Promise<{ port: number; result: Promise<OAuthCallbackResult> }> {
+  async start(
+    timeoutMs = 15 * 60 * 1000,
+  ): Promise<{ port: number; result: Promise<OAuthCallbackResult> }> {
     // 1. http.createServer，只 listen(0, "127.0.0.1")
     // 2. pathname === "/favicon.ico" 或非 /callback → 204/404，不关闭 server
     // 3. GET /callback?code&state → 200 简单 HTML，resolve，close
     // 4. GET /callback?error → 200 失败页 HTML，reject，close
     // 5. timeoutMs 到 → reject("登录超时")，close
   }
-  close(): void { /* server.close()；幂等 */ }
+  close(): void {
+    /* server.close()；幂等 */
+  }
 }
 ```
 
 安全约束：
+
 - 只绑定 `127.0.0.1`
 - 端口由 OS 分配
 - 成功页 HTML 无第三方脚本、无凭据、无 code
@@ -683,8 +704,12 @@ export class CredentialStore {
 export class AuthService {
   readonly onStatusChange: AuthEventEmitter<AuthStatus>;
 
-  async login(deps: LoginDeps): Promise<void> { /* 见 9.1 */ }
-  async logout(): Promise<void> { /* 见 9.2 */ }
+  async login(deps: LoginDeps): Promise<void> {
+    /* 见 9.1 */
+  }
+  async logout(): Promise<void> {
+    /* 见 9.2 */
+  }
   getStatus(): AuthStatus;
   getUserProfile(): UserProfile | null;
   getPublicUserInfo(): { displayName: string; emailMasked: string } | null;
@@ -699,6 +724,7 @@ export class AuthService {
 ```
 
 `login` 要点：
+
 1. 若已有进行中的 login：先 `close()` 旧 callback server，丢弃旧 PKCE，`abortAll` 认证请求
 2. 状态 = `loggingIn`
 3. `createOAuthAttempt()`（core）
@@ -712,6 +738,7 @@ export class AuthService {
 `restoreFromStorage`：有 blob → 根据缓存的 `entitlementStatus` 设状态；无则 `loggedOut`。不 await 网络。
 
 `validateSession`：
+
 - 无凭据 → 保持 `loggedOut`
 - `getValidAccessToken` 因网络失败 → **保持当前状态**，记录 warn
 - `getValidAccessToken` 因 refresh 无效 → `clear` + `loggedOut` + 需要时发 `login_required`
@@ -723,7 +750,11 @@ export class AuthService {
 
 ```typescript
 export class OAuthApiClient {
-  async exchangeCode(code: string, codeVerifier: string, redirectUri: string): Promise<OAuthTokens>;
+  async exchangeCode(
+    code: string,
+    codeVerifier: string,
+    redirectUri: string,
+  ): Promise<OAuthTokens>;
   async refreshToken(refreshToken: string): Promise<OAuthTokens>;
   async getProfile(): Promise<ProfileResponse>;
   async createRuntimeApiKey(): Promise<string>;
@@ -773,11 +804,16 @@ export type ErrorAction =
   | { type: "keep_status_show_error" }
   | { type: "show_to_user" };
 
-export function parseError(source: ApiSource, status: number, body: unknown): StructuredError;
+export function parseError(
+  source: ApiSource,
+  status: number,
+  body: unknown,
+): StructuredError;
 export function getErrorAction(error: StructuredError): ErrorAction;
 ```
 
 `getErrorAction` 必须看 `credentialKind`：
+
 - `credentialKind === "runtime"` 且 401 → `recreate_runtime_key_and_retry`（除非 reason 是 entitlement / quota）
 - `credentialKind === "oauth"` 且 `TOKEN_EXPIRED` / `SOFTWARE_OAUTH_ACCESS_TOKEN_INVALID` → `refresh_oauth_and_retry`
 - 网络错误（无 HTTP status 或 status 0）→ `keep_status_show_error`
@@ -789,6 +825,7 @@ export function getErrorAction(error: StructuredError): ErrorAction;
 四层防护：字段名匹配 → Bearer 兜底 → JWT 兜底 → `sk-` 兜底。实现保持 v1.0 的 `SanitizedLogger`。另把 `code`、`code_verifier`、`raw_key` 列入 `SENSITIVE_KEYS`。
 
 约束：
+
 - 不记录完整请求/响应体，只记录 URL、statusCode、reason
 - 错误堆栈打印前经过 sanitize
 - OutputChannel 输出前经过 sanitize
@@ -888,14 +925,14 @@ continue 2.0.0 的 `ConfigHandler` **没有**可注入的 `ContinueConfigProvide
 
 ### 7.4 裁剪范围
 
-| 模块 | 处理方式 | 说明 |
-|------|---------|------|
-| `extensions/intellij` | 可删除 | 第一阶段只做 VS Code |
-| `binary/`、`docs-site/`、continue 自有 `docs/` | 可暂留 | 第一期不以搬迁为任务 |
-| autocomplete | 保留代码，禁用功能 | 后续可能启用 |
-| Hub | 保留代码，禁用功能 | 后续可能启用 |
-| config-yaml 编辑器 | 保留包，禁用 UI 入口 | 不允许用户自定义模型 |
-| Agent、Cmd+K | 保留 | 认证不阻塞即可 |
+| 模块                                           | 处理方式             | 说明                 |
+| ---------------------------------------------- | -------------------- | -------------------- |
+| `extensions/intellij`                          | 可删除               | 第一阶段只做 VS Code |
+| `binary/`、`docs-site/`、continue 自有 `docs/` | 可暂留               | 第一期不以搬迁为任务 |
+| autocomplete                                   | 保留代码，禁用功能   | 后续可能启用         |
+| Hub                                            | 保留代码，禁用功能   | 后续可能启用         |
+| config-yaml 编辑器                             | 保留包，禁用 UI 入口 | 不允许用户自定义模型 |
+| Agent、Cmd+K                                   | 保留                 | 认证不阻塞即可       |
 
 ### 7.5 许可证与品牌
 
@@ -1061,6 +1098,7 @@ activate
 ### 10.2 登录中关闭 Webview
 
 AuthService 是 extension host 单例。关闭 Webview 不影响后台 login。完成后：
+
 - 成功：`showInformationMessage("万来账号登录成功")`
 - 失败：`showErrorMessage("万来登录失败：{原因}")`
 
@@ -1080,6 +1118,7 @@ AuthService 是 extension host 单例。关闭 Webview 不影响后台 login。�
 ```
 
 场景：
+
 - A 登录 → blob 写入 → B 收到 onDidChange → B 变为已登录
 - A 登出 → blob 删除 → B 变为未登录
 - B 请求中 A 登出 → B 得 401 → reload 发现无 blob → 登出
@@ -1096,20 +1135,20 @@ AuthService 是 extension host 单例。关闭 Webview 不影响后台 login。�
 
 ## 11. 安全边界落地检查
 
-| 安全边界 | 落地方式 | 验证方法 |
-|---------|---------|---------|
-| Webview 不持有 Token | 消息只传 status + 脱敏用户 | 审查 postMessage + Webview storage |
-| Token 不写入普通配置 | 只存 SecretStorage 单 blob；yaml 无 apiKey | 检查 `~/.continue/config.yaml` 与 settings.json |
-| Token 不写入工作区 | configuration scope=machine | 检查工作区目录 |
-| Token 不进日志 | SanitizedLogger | OutputChannel |
-| 网络错误不崩溃、不清登录 | try-catch；validateSession 区分 401 与网络错误 | 断网启动 |
-| 取消后不处理结果 | AbortController + revision + loginGeneration | 取消/二次登录测试 |
-| code_verifier 不落盘 | 仅内存 | SecretStorage 无该字段 |
-| 回调只监听本机 | `listen(port, "127.0.0.1")` | 外部不可达 |
-| 设备 ID 不可逆 | SHA256(namespace + machineId) | 无法反推 |
-| 凭据原子写入 | 单 key JSON blob | 杀进程后 blob 完整或为空 |
-| 邮箱脱敏 | 只推 emailMasked | postMessage 无原文 |
-| Apache 2.0 | 保留 LICENSE | 仓库根目录 |
+| 安全边界                 | 落地方式                                       | 验证方法                                        |
+| ------------------------ | ---------------------------------------------- | ----------------------------------------------- |
+| Webview 不持有 Token     | 消息只传 status + 脱敏用户                     | 审查 postMessage + Webview storage              |
+| Token 不写入普通配置     | 只存 SecretStorage 单 blob；yaml 无 apiKey     | 检查 `~/.continue/config.yaml` 与 settings.json |
+| Token 不写入工作区       | configuration scope=machine                    | 检查工作区目录                                  |
+| Token 不进日志           | SanitizedLogger                                | OutputChannel                                   |
+| 网络错误不崩溃、不清登录 | try-catch；validateSession 区分 401 与网络错误 | 断网启动                                        |
+| 取消后不处理结果         | AbortController + revision + loginGeneration   | 取消/二次登录测试                               |
+| code_verifier 不落盘     | 仅内存                                         | SecretStorage 无该字段                          |
+| 回调只监听本机           | `listen(port, "127.0.0.1")`                    | 外部不可达                                      |
+| 设备 ID 不可逆           | SHA256(namespace + machineId)                  | 无法反推                                        |
+| 凭据原子写入             | 单 key JSON blob                               | 杀进程后 blob 完整或为空                        |
+| 邮箱脱敏                 | 只推 emailMasked                               | postMessage 无原文                              |
+| Apache 2.0               | 保留 LICENSE                                   | 仓库根目录                                      |
 
 ---
 
@@ -1117,25 +1156,25 @@ AuthService 是 extension host 单例。关闭 Webview 不影响后台 login。�
 
 ### 12.1 Core 单元测试（vitest）
 
-| 测试模块 | 用例 |
-|---------|------|
-| `pkce` | codeVerifier 长度 ≥43；S256；verifyState 对/错；state 与 verifier 独立 |
-| `credentialStore` | 整包存取；过期触发刷新；并发 single-flight；代次丢弃旧刷新；登出后旧刷新失效；刷新成功保留 runtime key；refresh 无效才 clear；网络失败不 clear |
-| `authService` | login 编排；二次 login 取消第一次；logout；restore 不访问网络；validate 网络失败保持登录；无套餐状态；401 清登录 |
-| `oauthApiClient` | exchange/refresh 的 body.client_id 为 `wanlaicode-cli`；getProfile Authorization；createApiKey；错误抛 StructuredError |
-| `runtimeApiClient` | getModels 注入 X-Wanlai-*；取消后不处理 |
-| `errorMapper` | 四种结构；runtime 401 → recreate key；oauth 401 → refresh；网络错误 → keep_status |
-| `sanitizedLogger` | token/Bearer/JWT/sk-/code_verifier 被替换；正常文本不受影响 |
+| 测试模块           | 用例                                                                                                                                           |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pkce`             | codeVerifier 长度 ≥43；S256；verifyState 对/错；state 与 verifier 独立                                                                         |
+| `credentialStore`  | 整包存取；过期触发刷新；并发 single-flight；代次丢弃旧刷新；登出后旧刷新失效；刷新成功保留 runtime key；refresh 无效才 clear；网络失败不 clear |
+| `authService`      | login 编排；二次 login 取消第一次；logout；restore 不访问网络；validate 网络失败保持登录；无套餐状态；401 清登录                               |
+| `oauthApiClient`   | exchange/refresh 的 body.client_id 为 `wanlaicode-cli`；getProfile Authorization；createApiKey；错误抛 StructuredError                         |
+| `runtimeApiClient` | getModels 注入 X-Wanlai-\*；取消后不处理                                                                                                       |
+| `errorMapper`      | 四种结构；runtime 401 → recreate key；oauth 401 → refresh；网络错误 → keep_status                                                              |
+| `sanitizedLogger`  | token/Bearer/JWT/sk-/code_verifier 被替换；正常文本不受影响                                                                                    |
 
 ### 12.2 Extension 集成测试（@vscode/test-electron）
 
-| 用例 | 验证点 |
-|------|--------|
-| 激活恢复 | 预置 blob → 激活 → 乐观已登录（可 mock 网络） |
-| SecretStorage 单 blob | get/set/delete |
-| OAuthCallbackServer | 随机端口；favicon 不关闭；有效回调后关闭；超时关闭；只绑 127.0.0.1 |
-| 配置读取 | apiBaseUrl / siteBaseUrl 默认值 |
-| onDidChange | 写入 blob 后监听器触发（同窗口幂等） |
+| 用例                  | 验证点                                                             |
+| --------------------- | ------------------------------------------------------------------ |
+| 激活恢复              | 预置 blob → 激活 → 乐观已登录（可 mock 网络）                      |
+| SecretStorage 单 blob | get/set/delete                                                     |
+| OAuthCallbackServer   | 随机端口；favicon 不关闭；有效回调后关闭；超时关闭；只绑 127.0.0.1 |
+| 配置读取              | apiBaseUrl / siteBaseUrl 默认值                                    |
+| onDidChange           | 写入 blob 后监听器触发（同窗口幂等）                               |
 
 多窗口同步以 Extension Development Host 手动验证为主（自动化双窗口成本高）。
 
@@ -1166,34 +1205,34 @@ AuthService 是 extension host 单例。关闭 Webview 不影响后台 login。�
 
 本阶段以本文件为唯一实施依据，不强制拆出四份平行文档。实施计划见 `docs/superpowers/plans/`。若后续需要给非开发同事看，再从本文件摘：
 
-| 文档 | 内容 | 位置 |
-|------|------|------|
-| 认证与鉴权设计 | 本文档 | `docs/superpowers/specs/2026-08-13-core-auth-design.md` |
-| 总体阶段设计 | 仓库与插件路线（只读） | `docs/superpowers/specs/2026-08-12-wanlaiide-bootstrap-design.md` |
+| 文档           | 内容                   | 位置                                                              |
+| -------------- | ---------------------- | ----------------------------------------------------------------- |
+| 认证与鉴权设计 | 本文档                 | `docs/superpowers/specs/2026-08-13-core-auth-design.md`           |
+| 总体阶段设计   | 仓库与插件路线（只读） | `docs/superpowers/specs/2026-08-12-wanlaiide-bootstrap-design.md` |
 
 ---
 
 ## 14. 开发配置参考值（第一阶段）
 
-| 配置项 | 值 | 来源 |
-|--------|-----|------|
-| continue 基线 | `v2.0.0-vscode` | GitHub tag |
-| `client_id` | `wanlaicode-cli` | 授权/换票/刷新同一值 |
-| `product_code` | `wanlaicode` | 参考值；套餐判断看 entitlement.status |
-| `scope` | `user:profile user:inference` | 对接文档 |
-| `X-Wanlai-Client` | `wanlaicodex` | 参考值 |
-| `API_BASE` | `https://api.wanlai.ai/v1` | 万来品牌地址 |
-| `API_ORIGIN` | `https://api.wanlai.ai` | API_BASE 去掉 `/v1` |
-| `SITE_BASE` | `https://wanlai.ai` | 授权站点 |
-| 开通套餐 | `https://wanlai.ai/purchase` | 已确认 |
-| SecretStorage key | `wanlaiide.credentials` | 单 blob |
-| 登录超时 | 15 分钟 | 对接文档 |
-| OAuth/Profile 超时 | 15 秒 | 对接文档 |
-| 模型列表超时 | 15 秒 | 对接文档 |
-| 网络/5xx 重试 | 最多 2 次，1s / 2s | 对接文档 |
-| Access Token 过期缓冲 | 60 秒 | 提前刷新 |
-| Node | `>=20.20.1` | continue engines |
-| 包管理 | npm | continue 2.0.0 |
+| 配置项                | 值                            | 来源                                  |
+| --------------------- | ----------------------------- | ------------------------------------- |
+| continue 基线         | `v2.0.0-vscode`               | GitHub tag                            |
+| `client_id`           | `wanlaicode-cli`              | 授权/换票/刷新同一值                  |
+| `product_code`        | `wanlaicode`                  | 参考值；套餐判断看 entitlement.status |
+| `scope`               | `user:profile user:inference` | 对接文档                              |
+| `X-Wanlai-Client`     | `wanlaicodex`                 | 参考值                                |
+| `API_BASE`            | `https://api.wanlai.ai/v1`    | 万来品牌地址                          |
+| `API_ORIGIN`          | `https://api.wanlai.ai`       | API_BASE 去掉 `/v1`                   |
+| `SITE_BASE`           | `https://wanlai.ai`           | 授权站点                              |
+| 开通套餐              | `https://wanlai.ai/purchase`  | 已确认                                |
+| SecretStorage key     | `wanlaiide.credentials`       | 单 blob                               |
+| 登录超时              | 15 分钟                       | 对接文档                              |
+| OAuth/Profile 超时    | 15 秒                         | 对接文档                              |
+| 模型列表超时          | 15 秒                         | 对接文档                              |
+| 网络/5xx 重试         | 最多 2 次，1s / 2s            | 对接文档                              |
+| Access Token 过期缓冲 | 60 秒                         | 提前刷新                              |
+| Node                  | `>=20.20.1`                   | continue engines                      |
+| 包管理                | npm                           | continue 2.0.0                        |
 
 ---
 
@@ -1216,7 +1255,7 @@ AuthService 是 extension host 单例。关闭 Webview 不影响后台 login。�
 - 无套餐柔和提示
 - 登录中关闭 Webview
 - 多窗口：`onDidChange` + 聚焦兜底
-- 设备信息与 X-Wanlai-* 
+- 设备信息与 X-Wanlai-\*
 - `apiBaseUrl` / `siteBaseUrl`，scope=machine
 - core 单元测试
 - Extension Development Host 手动验证

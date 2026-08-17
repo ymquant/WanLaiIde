@@ -31,10 +31,7 @@ export async function createAuthModule(
   context: vscode.ExtensionContext,
 ): Promise<AuthModule> {
   const cfg = vscode.workspace.getConfiguration("wanlaiide");
-  const apiBaseUrl = cfg.get<string>(
-    "apiBaseUrl",
-    "https://api.wanlai.ai/v1",
-  );
+  const apiBaseUrl = cfg.get<string>("apiBaseUrl", "https://api.wanlai.ai/v1");
   const siteBaseUrl = cfg.get<string>("siteBaseUrl", "https://wanlai.ai");
   const apiOrigin = apiBaseUrl.replace(/\/v1\/?$/, "");
 

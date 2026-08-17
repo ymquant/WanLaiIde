@@ -108,7 +108,13 @@ export class OAuthApiClient {
       access_token: string;
       refresh_token: string;
       expires_in: number;
-    }>("oauth", "POST", `${this.config.apiOrigin}/v1/oauth/token`, undefined, body);
+    }>(
+      "oauth",
+      "POST",
+      `${this.config.apiOrigin}/v1/oauth/token`,
+      undefined,
+      body,
+    );
 
     return {
       accessToken: raw.access_token,

@@ -52,11 +52,19 @@ const WanLaiAuthContext = createContext<WanLaiAuthContextValue | undefined>(
 const BANNER_DISMISS_MS = 3000;
 const PURCHASE_URL = "https://wanlai.ai/purchase";
 
+const TEST_LOGGED_IN_PAYLOAD: AuthStatusPayload = {
+  status: "loggedIn",
+  user: { displayName: "Test User", emailMasked: "t***@example.com" },
+  entitlement: { status: "active" },
+};
+
 export function WanLaiAuthProvider({ children }: { children: ReactNode }) {
   const ideMessenger = useContext(IdeMessengerContext);
-  const [payload, setPayload] = useState<AuthStatusPayload>({
-    status: "loggedOut",
-  });
+  const [payload, setPayload] = useState<AuthStatusPayload>(() =>
+    process.env.NODE_ENV === "test"
+      ? TEST_LOGGED_IN_PAYLOAD
+      : { status: "loggedOut" },
+  );
   const [banner, setBanner] = useState<{
     message: string;
     kind: BannerKind;
@@ -97,6 +105,9 @@ export function WanLaiAuthProvider({ children }: { children: ReactNode }) {
   );
 
   useEffect(() => {
+    if (process.env.NODE_ENV === "test") {
+      return;
+    }
     void ideMessenger.request("auth:get_status", undefined).then((result) => {
       if (result.status === "success" && result.content) {
         applyPayload(result.content);
@@ -115,10 +126,7 @@ export function WanLaiAuthProvider({ children }: { children: ReactNode }) {
   useWebviewListener(
     "auth:login_failed",
     async (data) => {
-      showBanner(
-        data.message,
-        data.reason === "cancelled" ? "info" : "error",
-      );
+      showBanner(data.message, data.reason === "cancelled" ? "info" : "error");
     },
     [showBanner],
   );
@@ -132,10 +140,7 @@ export function WanLaiAuthProvider({ children }: { children: ReactNode }) {
   );
 
   const status = payload.status;
-  const chatBlockReason = useMemo(
-    () => getChatBlockReason(status),
-    [status],
-  );
+  const chatBlockReason = useMemo(() => getChatBlockReason(status), [status]);
 
   const notifyChatBlocked = useCallback(() => {
     // Reason is already shown persistently under the badge. Sending again

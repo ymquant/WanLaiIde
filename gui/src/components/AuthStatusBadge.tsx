@@ -65,21 +65,21 @@ export function AuthStatusBadge() {
       </div>
 
       {status === "loggedInNoEntitlement" && (
-        <p className="text-description m-0 text-2xs leading-snug">
+        <p className="text-description text-2xs m-0 leading-snug">
           {NO_ENTITLEMENT_HINT}
         </p>
       )}
 
       {/* Persistent reason when chat is blocked — does not replace history */}
       {chatBlockReason && status !== "loggedInNoEntitlement" && (
-        <p className="text-description m-0 text-2xs leading-snug">
+        <p className="text-description text-2xs m-0 leading-snug">
           {chatBlockReason}
         </p>
       )}
 
       {banner && (
         <p
-          className={`m-0 text-2xs leading-snug ${
+          className={`text-2xs m-0 leading-snug ${
             banner.kind === "error" ? "text-error" : "text-description"
           }`}
         >

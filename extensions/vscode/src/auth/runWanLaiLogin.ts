@@ -33,9 +33,10 @@ export async function runWanLaiLogin(
 }
 
 /** Show a 3s auto-dismissing notification for a login outcome. */
-export async function notifyWanLaiLoginOutcome(
-  result: { outcome: WanLaiLoginOutcome; message?: string },
-): Promise<void> {
+export async function notifyWanLaiLoginOutcome(result: {
+  outcome: WanLaiLoginOutcome;
+  message?: string;
+}): Promise<void> {
   if (result.outcome === "success") {
     await showTimedNotification("万来账号登录成功", "info", 3000);
     return;
@@ -44,9 +45,5 @@ export async function notifyWanLaiLoginOutcome(
     await showTimedNotification(result.message ?? "已取消登录", "info", 3000);
     return;
   }
-  await showTimedNotification(
-    result.message ?? "万来登录失败",
-    "error",
-    3000,
-  );
+  await showTimedNotification(result.message ?? "万来登录失败", "error", 3000);
 }

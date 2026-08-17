@@ -280,7 +280,11 @@ export class OAuthCallbackServer implements CallbackServerPort {
   private server: http.Server | null = null;
   private closed = false;
   private settleResult:
-    | ((outcome: { ok: true; value: OAuthCallbackResult } | { ok: false; error: Error }) => void)
+    | ((
+        outcome:
+          | { ok: true; value: OAuthCallbackResult }
+          | { ok: false; error: Error },
+      ) => void)
     | null = null;
   private timeoutHandle: ReturnType<typeof setTimeout> | null = null;
 
@@ -380,14 +384,11 @@ export class OAuthCallbackServer implements CallbackServerPort {
     if (error) {
       res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
       res.end(FAILURE_HTML);
-      const cancelled =
-        error === "access_denied" || error === "login_required";
+      const cancelled = error === "access_denied" || error === "login_required";
       this.finish(
         false,
         undefined,
-        cancelled
-          ? loginCancelled("已取消登录")
-          : new Error(error),
+        cancelled ? loginCancelled("已取消登录") : new Error(error),
       );
       return;
     }
@@ -406,10 +407,7 @@ export class OAuthCallbackServer implements CallbackServerPort {
     this.finish(true, { code, state });
   }
 
-  private finish(
-    ok: true,
-    value: OAuthCallbackResult,
-  ): void;
+  private finish(ok: true, value: OAuthCallbackResult): void;
   private finish(ok: false, value: undefined, error: Error): void;
   private finish(
     ok: boolean,
@@ -443,8 +441,13 @@ export class OAuthCallbackServer implements CallbackServerPort {
     const server = this.server;
     this.server = null;
     this.closed = true;
-    if (typeof (server as http.Server & { closeAllConnections?: () => void }).closeAllConnections === "function") {
-      (server as http.Server & { closeAllConnections: () => void }).closeAllConnections();
+    if (
+      typeof (server as http.Server & { closeAllConnections?: () => void })
+        .closeAllConnections === "function"
+    ) {
+      (
+        server as http.Server & { closeAllConnections: () => void }
+      ).closeAllConnections();
     }
     server.close();
   }

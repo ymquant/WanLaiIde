@@ -1,9 +1,6 @@
 import type { LoggerPort } from "../ports/loggerPort.js";
 import type { SecretStoragePort } from "../ports/secretStoragePort.js";
-import {
-  getErrorAction,
-  type StructuredError,
-} from "./errorMapper.js";
+import { getErrorAction, type StructuredError } from "./errorMapper.js";
 import {
   CREDENTIALS_STORAGE_KEY,
   type Credentials,
@@ -136,10 +133,7 @@ export class CredentialStore {
       runtimeApiKey: this.credentials.runtimeApiKey,
       entitlementStatus: this.credentials.entitlementStatus,
     };
-    await this.storage.store(
-      CREDENTIALS_STORAGE_KEY,
-      JSON.stringify(blob),
-    );
+    await this.storage.store(CREDENTIALS_STORAGE_KEY, JSON.stringify(blob));
   }
 
   private async refresh(): Promise<void> {

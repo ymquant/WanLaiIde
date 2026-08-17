@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import type { HttpClientPort, HttpRequestOptions, HttpResponse } from "../ports/httpClientPort.js";
+import type {
+  HttpClientPort,
+  HttpRequestOptions,
+  HttpResponse,
+} from "../ports/httpClientPort.js";
 import { RuntimeApiClient } from "./runtimeApiClient.js";
 import {
   DEFAULT_CLIENT_ID,
@@ -57,7 +61,9 @@ describe("RuntimeApiClient", () => {
     expect(http.lastRequest!.timeoutMs).toBe(15_000);
     expect(http.lastRequest!.headers?.Authorization).toBe("Bearer sk-test");
     expect(http.lastRequest!.headers?.["X-Wanlai-Client"]).toBe("wanlaicodex");
-    expect(http.lastRequest!.headers?.["X-Wanlai-Device-Id"]).toBe("device-abc");
+    expect(http.lastRequest!.headers?.["X-Wanlai-Device-Id"]).toBe(
+      "device-abc",
+    );
     expect(models).toEqual([{ id: "model-a", object: "model" }]);
   });
 
@@ -76,8 +82,12 @@ describe("RuntimeApiClient", () => {
 
     await client.getModels();
 
-    expect(http.lastRequest!.headers?.["X-Wanlai-Device-Name"]).toBe("DevMachine");
-    expect(http.lastRequest!.headers?.["X-Wanlai-Device-Name"]).not.toContain("\n");
+    expect(http.lastRequest!.headers?.["X-Wanlai-Device-Name"]).toBe(
+      "DevMachine",
+    );
+    expect(http.lastRequest!.headers?.["X-Wanlai-Device-Name"]).not.toContain(
+      "\n",
+    );
   });
 
   it("throws StructuredError on HTTP 4xx via parseError", async () => {

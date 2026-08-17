@@ -32,9 +32,12 @@ describe("OAuthCallbackServer", () => {
     const res = await resPromise;
     const html = await res.text();
     expect(html).toContain("登录成功");
-    expect(html).toContain("可以关闭此页面");
-    expect(html.toLowerCase()).not.toContain("<script");
+    expect(html).toContain("身份验证已完成");
+    expect(html).toContain("立即关闭");
+    expect(html).toContain("window.close()");
     expect(html).not.toContain("tok");
+    expect(html).not.toContain("code=tok");
+    expect(html).not.toContain("state=st");
 
     // Server closed after callback (address cleared; OS may briefly keep the port).
     expect(server.getListenAddress()).toBeNull();
@@ -56,8 +59,11 @@ describe("OAuthCallbackServer", () => {
     const res = await resPromise;
     const html = await res.text();
     expect(html).toContain("登录失败");
-    expect(html).toContain("可以关闭此页面");
-    expect(html.toLowerCase()).not.toContain("<script");
+    expect(html).toContain("登录未完成");
+    expect(html).toContain("身份验证失败");
+    expect(html).toContain("立即关闭");
+    expect(html).toContain("window.close()");
+    expect(html).not.toContain("access_denied");
   });
 
   it("listens on 127.0.0.1 only", async () => {

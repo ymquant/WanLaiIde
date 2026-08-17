@@ -25,8 +25,7 @@ export class HttpClientAdapter implements HttpClientPort {
       };
       let body: string | undefined;
       if (options.body !== undefined) {
-        headers["Content-Type"] =
-          headers["Content-Type"] ?? "application/json";
+        headers["Content-Type"] = headers["Content-Type"] ?? "application/json";
         body =
           typeof options.body === "string"
             ? options.body

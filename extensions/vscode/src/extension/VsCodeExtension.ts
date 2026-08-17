@@ -177,10 +177,7 @@ export class VsCodeExtension {
     }
   }
 
-  constructor(
-    context: vscode.ExtensionContext,
-    authModule?: AuthModule,
-  ) {
+  constructor(context: vscode.ExtensionContext, authModule?: AuthModule) {
     this.authModule = authModule;
     this.editDecorationManager = new EditDecorationManager(context);
 
@@ -693,8 +690,7 @@ export class VsCodeExtension {
         return;
       }
       void webviewProtocol.request("auth:login_failed", {
-        reason:
-          result.outcome === "cancelled" ? "cancelled" : "login_failed",
+        reason: result.outcome === "cancelled" ? "cancelled" : "login_failed",
         message:
           result.message ??
           (result.outcome === "cancelled"

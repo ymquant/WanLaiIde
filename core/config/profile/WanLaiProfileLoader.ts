@@ -6,7 +6,10 @@ import type { ConfigResult, ModelConfig } from "@continuedev/config-yaml";
 
 import type { ContinueConfig, IDE, ILLMLogger } from "../../index.js";
 import type { AuthService } from "../../auth/authService.js";
-import type { ModelInfo, RuntimeApiClient } from "../../auth/runtimeApiClient.js";
+import type {
+  ModelInfo,
+  RuntimeApiClient,
+} from "../../auth/runtimeApiClient.js";
 import type { DeviceInfo, OAuthClientConfig } from "../../auth/types.js";
 import type { ProfileDescription } from "../ProfileLifecycleManager.js";
 import { rectifySelectedModelsFromGlobalContext } from "../selectedModels.js";
@@ -41,8 +44,7 @@ export interface MapWanLaiModelsParams {
 export function mapRuntimeModelsToWanLaiModelConfigs(
   params: MapWanLaiModelsParams,
 ): ModelConfig[] {
-  const { runtimeKey, apiBase, clientName, clientVersion, deviceInfo } =
-    params;
+  const { runtimeKey, apiBase, clientName, clientVersion, deviceInfo } = params;
   const headers = {
     "X-Wanlai-Client": sanitizeHeader(clientName, 128),
     "X-Wanlai-Client-Version": sanitizeHeader(clientVersion, 128),

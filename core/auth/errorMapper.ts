@@ -125,7 +125,12 @@ export function parseError(
 
 export function getErrorAction(error: StructuredError): ErrorAction {
   const status = error.statusCode;
-  if (status === 0 || status == null || Number.isNaN(status)) {
+  if (
+    status === 0 ||
+    status === null ||
+    status === undefined ||
+    Number.isNaN(status)
+  ) {
     return { type: "keep_status_show_error" };
   }
 

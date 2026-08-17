@@ -37,6 +37,11 @@ const DEFAULT_MOCK_CORE_RESPONSES: MockResponses = {
     "file:///Users/user/workspace2",
   ],
   "history/list": [],
+  "auth:get_status": {
+    status: "loggedIn",
+    user: { displayName: "Test User", emailMasked: "t***@example.com" },
+    entitlement: { status: "active" },
+  },
   "docs/getIndexedPages": [],
   "history/save": undefined,
   "config/getSerializedProfileInfo": {

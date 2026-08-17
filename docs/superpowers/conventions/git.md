@@ -10,13 +10,13 @@
 - `description` 使用 **snake_case**
 - 禁止中文、空格、特殊符号（含连字符 `-`）
 
-| Type | 用途 | 示例 |
-|------|------|------|
-| feat | 新功能 | `feat/login_api`、`feat/oauth_login` |
-| fix | Bug 修复 | `fix/completion_crash` |
-| refactor | 重构 | `refactor/overlay_layout` |
-| chore | 构建/工具/依赖 | `chore/ci_setup` |
-| docs | 文档 | `docs/install_guide` |
+| Type     | 用途           | 示例                                 |
+| -------- | -------------- | ------------------------------------ |
+| feat     | 新功能         | `feat/login_api`、`feat/oauth_login` |
+| fix      | Bug 修复       | `fix/completion_crash`               |
+| refactor | 重构           | `refactor/overlay_layout`            |
+| chore    | 构建/工具/依赖 | `chore/ci_setup`                     |
+| docs     | 文档           | `docs/install_guide`                 |
 
 保护分支：
 
@@ -48,15 +48,15 @@ refactor(overlay): 重构 Creator Mode 布局逻辑
 chore(continue): 导入 continue v2.0.0-vscode 作为基线
 ```
 
-| Scope | 含义 |
-|-------|------|
+| Scope    | 含义                                                   |
+| -------- | ------------------------------------------------------ |
 | continue | wanlai-continue 插件（本仓库 VS Code 扩展与 core/gui） |
-| roocode | wanlai-roocode 插件 |
-| brand | 品牌替换 |
-| i18n | 汉化 |
-| ci | CI/CD |
-| build | 构建打包 |
-| overlay | 主仓库 overlay/UI |
+| roocode  | wanlai-roocode 插件                                    |
+| brand    | 品牌替换                                               |
+| i18n     | 汉化                                                   |
+| ci       | CI/CD                                                  |
+| build    | 构建打包                                               |
+| overlay  | 主仓库 overlay/UI                                      |
 
 ## AI 建议提交时的固定格式
 

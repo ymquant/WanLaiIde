@@ -27,35 +27,29 @@
 - 品牌 SVG 源文件：`assets/brand/wanlaiide.svg`
 - 默认 `apiBaseUrl`：`https://api.wanlai.ai/v1`；`siteBaseUrl`：`https://wanlai.ai`
 
-
-
 ## File map
 
-
-| 路径                                             | 职责                                                  |
-| ---------------------------------------------- | --------------------------------------------------- |
-| `core/ports/*.ts`                              | SecretStorage / HTTP / Logger / CallbackServer 接口   |
-| `core/auth/pkce.ts`                            | PKCE + timing-safe state                            |
-| `core/auth/eventEmitter.ts`                    | 不依赖 vscode 的订阅器                                     |
-| `core/auth/types.ts`                           | 凭据、状态、blob 类型                                       |
-| `core/auth/errorMapper.ts`                     | 四种错误结构 + 凭据类型分流                                     |
-| `core/auth/sanitizedLogger.ts`                 | 四层脱敏                                                |
-| `core/auth/credentialStore.ts`                 | 单 blob、代次、single-flight 刷新                          |
-| `core/auth/oauthApiClient.ts`                  | token / profile / create_api_key                    |
-| `core/auth/runtimeApiClient.ts`                | 仅 `getModels`（可选 smokeChat）                         |
-| `core/auth/authService.ts`                     | 登录编排、restore、validateSession                        |
-| `core/auth/requestCanceller.ts`                | in-flight AbortController 集合                        |
-| `core/config/profile/WanLaiProfileLoader.ts`   | 内存 profile，注入 models + headers                      |
-| `core/config/ConfigHandler.ts`                 | 小改：允许注册并优先选中万来 profile                              |
+| 路径                                           | 职责                                                         |
+| ---------------------------------------------- | ------------------------------------------------------------ |
+| `core/ports/*.ts`                              | SecretStorage / HTTP / Logger / CallbackServer 接口          |
+| `core/auth/pkce.ts`                            | PKCE + timing-safe state                                     |
+| `core/auth/eventEmitter.ts`                    | 不依赖 vscode 的订阅器                                       |
+| `core/auth/types.ts`                           | 凭据、状态、blob 类型                                        |
+| `core/auth/errorMapper.ts`                     | 四种错误结构 + 凭据类型分流                                  |
+| `core/auth/sanitizedLogger.ts`                 | 四层脱敏                                                     |
+| `core/auth/credentialStore.ts`                 | 单 blob、代次、single-flight 刷新                            |
+| `core/auth/oauthApiClient.ts`                  | token / profile / create_api_key                             |
+| `core/auth/runtimeApiClient.ts`                | 仅 `getModels`（可选 smokeChat）                             |
+| `core/auth/authService.ts`                     | 登录编排、restore、validateSession                           |
+| `core/auth/requestCanceller.ts`                | in-flight AbortController 集合                               |
+| `core/config/profile/WanLaiProfileLoader.ts`   | 内存 profile，注入 models + headers                          |
+| `core/config/ConfigHandler.ts`                 | 小改：允许注册并优先选中万来 profile                         |
 | `extensions/vscode/src/auth/*.ts`              | OAuth 回调 server、SecretStorage/HTTP 适配、deviceInfo、组装 |
-| `extensions/vscode/src/activation/activate.ts` | 激活时先 restore，不阻塞网络                                  |
-| `extensions/vscode/package.json`               | 扩展标识、`wanlaiide.*` 配置、登录命令                          |
-| `gui/src/components/AuthStatusBadge.tsx`       | 登录态展示                                               |
-
+| `extensions/vscode/src/activation/activate.ts` | 激活时先 restore，不阻塞网络                                 |
+| `extensions/vscode/package.json`               | 扩展标识、`wanlaiide.*` 配置、登录命令                       |
+| `gui/src/components/AuthStatusBadge.tsx`       | 登录态展示                                                   |
 
 ---
-
-
 
 ### Task 1: 导入 continue v2.0.0-vscode 并确认能启动
 
@@ -146,8 +140,6 @@ git commit -m "chore(bootstrap): import continue v2.0.0-vscode as WanLai IDE bas
 
 ---
 
-
-
 ### Task 2: 轻量换皮（标识与图标，不改目录）
 
 **Files:**
@@ -227,8 +219,6 @@ git commit -m "chore: rebrand VS Code extension metadata to WanLai IDE"
 ```
 
 ---
-
-
 
 ### Task 3: core ports、事件器、PKCE
 
@@ -436,8 +426,6 @@ git commit -m "feat: add auth ports, PKCE, and in-process event helpers"
 
 ---
 
-
-
 ### Task 4: errorMapper 与 sanitizedLogger
 
 **Files:**
@@ -486,8 +474,6 @@ git commit -m "feat: add auth error mapping and log sanitization"
 ```
 
 ---
-
-
 
 ### Task 5: CredentialStore
 
@@ -552,8 +538,6 @@ git commit -m "feat: add atomic credential blob store with single-flight refresh
 
 ---
 
-
-
 ### Task 6: OAuth 与 Runtime API client
 
 **Files:**
@@ -606,8 +590,6 @@ git commit -m "feat: add WanLai OAuth and models API clients"
 ```
 
 ---
-
-
 
 ### Task 7: AuthService
 
@@ -665,8 +647,6 @@ git commit -m "feat: add AuthService login, restore, and session validation"
 ```
 
 ---
-
-
 
 ### Task 8: VS Code 适配器 + 激活接线（不含模型注入）
 
@@ -728,16 +708,24 @@ void authModule.authService.validateSession().catch((err) => {
 ```typescript
 context.subscriptions.push(
   vscode.commands.registerCommand("wanlaiide.auth.login", () =>
-    authModule.authService.login({
-      openBrowser: (url) => vscode.env.openExternal(vscode.Uri.parse(url)).then(() => undefined),
-      createCallbackServer: () => new OAuthCallbackServer(),
-      redirectUriFactory: (port) => `http://127.0.0.1:${port}/callback`,
-    }).then(
-      () => vscode.window.showInformationMessage("万来账号登录成功"),
-      (err) => vscode.window.showErrorMessage(`万来登录失败：${err instanceof Error ? err.message : String(err)}`),
-    ),
+    authModule.authService
+      .login({
+        openBrowser: (url) =>
+          vscode.env.openExternal(vscode.Uri.parse(url)).then(() => undefined),
+        createCallbackServer: () => new OAuthCallbackServer(),
+        redirectUriFactory: (port) => `http://127.0.0.1:${port}/callback`,
+      })
+      .then(
+        () => vscode.window.showInformationMessage("万来账号登录成功"),
+        (err) =>
+          vscode.window.showErrorMessage(
+            `万来登录失败：${err instanceof Error ? err.message : String(err)}`,
+          ),
+      ),
   ),
-  vscode.commands.registerCommand("wanlaiide.auth.logout", () => authModule.authService.logout()),
+  vscode.commands.registerCommand("wanlaiide.auth.logout", () =>
+    authModule.authService.logout(),
+  ),
   context.secrets.onDidChange(async (e) => {
     if (e.key !== "wanlaiide.credentials") return;
     await authModule.credentialStore.reloadFromStorage();
@@ -767,8 +755,6 @@ git commit -m "feat: wire WanLai OAuth login into the VS Code extension host"
 ```
 
 ---
-
-
 
 ### Task 9: WanLaiProfileLoader 注入 ConfigHandler
 
@@ -864,8 +850,6 @@ git commit -m "feat: inject WanLai models into Continue config from auth session
 
 ---
 
-
-
 ### Task 10: GUI 登录态与消息协议
 
 **Files:**
@@ -912,8 +896,6 @@ git commit -m "feat: show WanLai auth status in the chat sidebar"
 
 ---
 
-
-
 ### Task 11: 用 continue Chat 做真实对话验证 + 安全检查
 
 **Files:**
@@ -957,29 +939,25 @@ git commit -m "test: verify WanLai auth session, chat path, and secret hygiene"
 
 ---
 
-
-
 ## Self-review
 
 **Spec coverage:**
 
-
-| spec 要求                     | 任务       |
-| --------------------------- | -------- |
-| 导入 continue + LICENSE       | Task 1   |
-| 不改目录 / npm                  | Task 1–2 |
-| 换皮                          | Task 2   |
-| PKCE、ports                  | Task 3   |
-| 错误分流、脱敏                     | Task 4   |
-| 单 blob 凭据                   | Task 5   |
-| client_id 统一、models client  | Task 6   |
-| restore/validate/二次登录       | Task 7   |
+| spec 要求                            | 任务     |
+| ------------------------------------ | -------- |
+| 导入 continue + LICENSE              | Task 1   |
+| 不改目录 / npm                       | Task 1–2 |
+| 换皮                                 | Task 2   |
+| PKCE、ports                          | Task 3   |
+| 错误分流、脱敏                       | Task 4   |
+| 单 blob 凭据                         | Task 5   |
+| client_id 统一、models client        | Task 6   |
+| restore/validate/二次登录            | Task 7   |
 | 回调 server、激活不阻塞、onDidChange | Task 8   |
-| ConfigHandler 注入、headers    | Task 9   |
-| Webview 协议与无套餐 UX           | Task 10  |
+| ConfigHandler 注入、headers          | Task 9   |
+| Webview 协议与无套餐 UX              | Task 10  |
 | Chat 真通、断网不清登录              | Task 11  |
-| 自写 SSE / 重命名 packages       | 明确不做     |
-
+| 自写 SSE / 重命名 packages           | 明确不做 |
 
 **Placeholder scan:** Task 2 图标若无法转 PNG 允许暂缓，不影响鉴权。Task 9 必须先读 LocalProfileLoader 再写，接口名以 fork 代码为准。
 
