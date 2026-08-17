@@ -99,7 +99,8 @@ runs:
       run: |
         cd core
         npm ci
-        npm i vectordb
+        # vectordb 原生包在部分 runner 上装失败；Continue 上游也常把它当可选索引依赖。
+        npm i vectordb || echo "::warning::vectordb install failed, continuing without it"
 
     - name: Build GUI
       shell: bash

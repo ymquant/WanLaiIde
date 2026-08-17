@@ -75,7 +75,9 @@ jobs:
           npm test
           npm run vitest
         env:
-          IGNORE_API_KEY_TESTS: ${{ steps.llm-changes.outputs.ignore_api_tests }}
+          # Continue 仅在「未改 core/llm」时才忽略 API 测。本仓库相对 main 的首批
+          # PR 几乎总会碰到 core/llm，且没有 Continue 那套模型密钥，必须固定跳过。
+          IGNORE_API_KEY_TESTS: "true"
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -210,7 +212,7 @@ jobs:
           npm ci
           npm test
         env:
-          IGNORE_API_KEY_TESTS: ${{ steps.llm-changes.outputs.ignore_api_tests }}
+          IGNORE_API_KEY_TESTS: "true"
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -309,6 +311,8 @@ jobs:
           path: extensions/vscode/build
 
   vscode-e2e-tests:
+    # 第一期不做 Continue 上游 Electron e2e（依赖 VSIX 产物与 SSH secret）。
+    if: false
     name: ${{ matrix.test_file || 'unknown' }} (${{ matrix.command }})
     needs: [vscode-get-test-file-matrix, vscode-package-extension-linux]
     runs-on: ubuntu-latest
@@ -332,6 +336,8 @@ jobs:
           github_token: ${{ secrets.CI_GITHUB_TOKEN }}
 
   jetbrains-tests:
+    # 第一期只交付 VS Code 扩展，不跑 IntelliJ 测试。
+    if: false
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -377,4 +383,5 @@ jobs:
       - name: Decide whether the needed jobs succeeded or failed
         uses: re-actors/alls-green@release/v1
         with:
+          allowed-skips: jetbrains-tests, vscode-e2e-tests
           jobs: ${{ toJSON(needs) }}
