@@ -101,10 +101,7 @@ void (async () => {
 
   const indexHtmlPath = path.join(intellijExtensionWebviewPath, "index.html");
   if (!fs.existsSync(indexHtmlPath)) {
-    console.warn(
-      "[warn] Skipping JetBrains gui copy: missing",
-      indexHtmlPath,
-    );
+    console.warn("[warn] Skipping JetBrains gui copy: missing", indexHtmlPath);
   } else {
     fs.copyFileSync(indexHtmlPath, "tmp_index.html");
     rimrafSync(intellijExtensionWebviewPath);
