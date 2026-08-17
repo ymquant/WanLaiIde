@@ -1,0 +1,15 @@
+{
+  "name": "wanlaiide",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Brand asset generation and validation for WanLai IDE.",
+  "type": "module",
+  "scripts": {
+    "icons:generate": "node scripts/generate-icons.mjs",
+    "icons:check": "node scripts/verify-icons.mjs",
+    "test": "npm run icons:check"
+  },
+  "devDependencies": {
+    "sharp": "^0.34.3"
+  }
+}

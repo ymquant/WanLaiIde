@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "source": "../wanlaiide.svg",
+  "sourceSha256": "9f988cae885a7615c4611a46f008629fc2e349462746c50c68be4a6242012abf",
+  "files": [
+    {
+      "file": "wanlaiide-16.png",
+      "size": 16,
+      "sha256": "4381aa72f45a1feabe8c3c12d0323aa28245ca707717043dc6e7ae281213e47c"
+    },
+    {
+      "file": "wanlaiide-24.png",
+      "size": 24,
+      "sha256": "0fd9aeb3ac657b650c6d175ba4d9f63f229fdd3847a127b6b62b202afe1d06a1"
+    },
+    {
+      "file": "wanlaiide-32.png",
+      "size": 32,
+      "sha256": "b984feaffbaa6a187803854df132c3caba1bc7e12f3f4d31d7312f5ff295f2fd"
+    },
+    {
+      "file": "wanlaiide-48.png",
+      "size": 48,
+      "sha256": "787613970c1836dd54262daf186d9d4102190e90d854fc8211d8143952d6cd48"
+    },
+    {
+      "file": "wanlaiide-128.png",
+      "size": 128,
+      "sha256": "97d9bc9d079d31ae72a3b5c88d35b31ee08d709b35464b0c015b73933f2a9c36"
+    },
+    {
+      "file": "wanlaiide-256.png",
+      "size": 256,
+      "sha256": "acce4c12238cb24b687c489feee80343eec7c9782073abd9ed7be45b47cc48d4"
+    },
+    {
+      "file": "wanlaiide-activitybar.svg",
+      "role": "activity-bar",
+      "sha256": "ad0a6f9bcb09266813a409e7d2ed9c2e3d42f1be9a430a9a529cf665cb85f064"
+    }
+  ]
+}
