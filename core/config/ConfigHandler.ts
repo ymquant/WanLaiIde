@@ -33,12 +33,18 @@ export class ConfigHandler {
   private globalLocalProfileManager: ProfileLifecycleManager;
 
   private profiles: ProfileLifecycleManager[] = [];
+  private wanLaiProfile: ProfileLifecycleManager | null = null;
 
   get profileDescriptions(): ProfileDescription[] {
     return this.profiles.map((p) => p.profileDescription);
   }
   currentProfile: ProfileLifecycleManager | null;
   totalConfigReloads: number = 0;
+
+  /** Register in-memory WanLai profile; next loadProfiles / refreshAll will prefer it. */
+  registerWanLaiProfile(manager: ProfileLifecycleManager) {
+    this.wanLaiProfile = manager;
+  }
 
   public isInitialized: Promise<void>;
   private initter: EventEmitter;
@@ -99,9 +105,15 @@ export class ConfigHandler {
       const currentSelection = selectedProfiles[workspaceId];
 
       const fallback = profiles.length > 0 ? profiles[0] : null;
+      const wanLai = profiles.find(
+        (profile) => profile.profileDescription.id === "wanlaiide",
+      );
 
       let selectedProfile: ProfileLifecycleManager | null;
-      if (currentSelection) {
+      if (wanLai) {
+        // Prefer WanLai in-memory profile when registered
+        selectedProfile = wanLai;
+      } else if (currentSelection) {
         const match = profiles.find(
           (profile) => profile.profileDescription.id === currentSelection,
         );
@@ -145,6 +157,9 @@ export class ConfigHandler {
         includeGlobal: true,
         includeWorkspace: true,
       });
+      if (this.wanLaiProfile) {
+        return { profiles: [this.wanLaiProfile, ...profiles], errors };
+      }
       return { profiles };
     } catch (e) {
       errors.push({
@@ -152,7 +167,7 @@ export class ConfigHandler {
         message: `Error loading local assistants${e instanceof Error ? ":\n" + e.message : ""}`,
       });
       return {
-        profiles: [],
+        profiles: this.wanLaiProfile ? [this.wanLaiProfile] : [],
         errors,
       };
     }
