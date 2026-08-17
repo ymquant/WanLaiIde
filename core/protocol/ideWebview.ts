@@ -12,6 +12,7 @@ import {
   SetCodeToEditPayload,
   ShowFilePayload,
 } from "../";
+import type { AuthStatusPayload } from "../auth/types";
 
 export type ToIdeFromWebviewProtocol = ToIdeFromWebviewOrCoreProtocol & {
   openUrl: [string, void];
@@ -50,6 +51,9 @@ export type ToIdeFromWebviewProtocol = ToIdeFromWebviewOrCoreProtocol & {
   "edit/addCurrentSelection": [undefined, void];
   "edit/clearDecorations": [undefined, void];
   "session/share": [{ sessionId: string }, void];
+  "auth:login": [undefined, void];
+  "auth:logout": [undefined, void];
+  "auth:get_status": [undefined, AuthStatusPayload];
 };
 
 export type ToWebviewFromIdeProtocol = ToWebviewFromIdeOrCoreProtocol & {
@@ -79,4 +83,7 @@ export type ToWebviewFromIdeProtocol = ToWebviewFromIdeOrCoreProtocol & {
   exitEditMode: [undefined, void];
   focusEdit: [undefined, void];
   addToChat: [AddToChatPayload, void];
+  "auth:status": [AuthStatusPayload, void];
+  "auth:login_failed": [{ reason: string; message: string }, void];
+  "auth:login_required": [{ message: string }, void];
 };

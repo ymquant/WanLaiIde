@@ -147,10 +147,30 @@
           "type": "number",
           "default": 60,
           "description": "The period of time in minutes between automatic syncs."
+        },
+        "wanlaiide.apiBaseUrl": {
+          "type": "string",
+          "default": "https://api.wanlai.ai/v1",
+          "description": "万来服务 API 根地址",
+          "scope": "machine"
+        },
+        "wanlaiide.siteBaseUrl": {
+          "type": "string",
+          "default": "https://wanlai.ai",
+          "description": "万来授权站点地址（OAuth 登录页）",
+          "scope": "machine"
         }
       }
     },
     "commands": [
+      {
+        "command": "wanlaiide.auth.login",
+        "title": "WanLai: Sign In"
+      },
+      {
+        "command": "wanlaiide.auth.logout",
+        "title": "WanLai: Sign Out"
+      },
       {
         "command": "continue.applyCodeFromChat",
         "category": "Continue",

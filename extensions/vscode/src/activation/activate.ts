@@ -1,6 +1,12 @@
 import { getContinueRcPath, getTsConfigPath } from "core/util/paths";
+import { CREDENTIALS_STORAGE_KEY } from "core/auth/types";
 import * as vscode from "vscode";
 
+import { createAuthModule } from "../auth/createAuthModule";
+import {
+  notifyWanLaiLoginOutcome,
+  runWanLaiLogin,
+} from "../auth/runWanLaiLogin";
 import { VsCodeExtension } from "../extension/VsCodeExtension";
 import { isUnsupportedPlatform } from "../util/util";
 
@@ -9,6 +15,36 @@ import { VsCodeContinueApi } from "./api";
 import setupInlineTips from "./InlineTipManager";
 
 export async function activateExtension(context: vscode.ExtensionContext) {
+  const authModule = await createAuthModule(context);
+  await authModule.authService.restoreFromStorage();
+  void authModule.authService.validateSession().catch((err) => {
+    authModule.logger.warn("validateSession failed", { err: String(err) });
+  });
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand("wanlaiide.auth.login", async () => {
+      const result = await runWanLaiLogin(authModule);
+      await notifyWanLaiLoginOutcome(result);
+    }),
+    vscode.commands.registerCommand("wanlaiide.auth.logout", () =>
+      authModule.authService.logout(),
+    ),
+    context.secrets.onDidChange(async (e) => {
+      if (e.key !== CREDENTIALS_STORAGE_KEY) {
+        return;
+      }
+      await authModule.credentialStore.reloadFromStorage();
+      await authModule.authService.syncStatusFromStore();
+    }),
+    vscode.window.onDidChangeWindowState(async (state) => {
+      if (!state.focused) {
+        return;
+      }
+      await authModule.credentialStore.reloadFromStorage();
+      await authModule.authService.syncStatusFromStore();
+    }),
+  );
+
   const platformCheck = isUnsupportedPlatform();
   const globalContext = new GlobalContext();
   const hasShownUnsupportedPlatformWarning = globalContext.get(
@@ -31,7 +67,7 @@ export async function activateExtension(context: vscode.ExtensionContext) {
   // Register commands and providers
   setupInlineTips(context);
 
-  const vscodeExtension = new VsCodeExtension(context);
+  const vscodeExtension = new VsCodeExtension(context, authModule);
 
   // Load Continue configuration
   if (!context.globalState.get("hasBeenInstalled")) {

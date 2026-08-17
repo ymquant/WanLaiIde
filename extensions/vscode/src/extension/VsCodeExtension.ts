@@ -59,12 +59,20 @@ import {
   initDocumentContentCache,
 } from "../util/editLoggingUtils";
 import type { VsCodeWebviewProtocol } from "../webviewProtocol";
+import type { AuthModule } from "../auth/createAuthModule";
+import { buildAuthStatusPayload } from "../auth/authStatusPayload";
+import {
+  notifyWanLaiLoginOutcome,
+  runWanLaiLogin,
+} from "../auth/runWanLaiLogin";
+import { attachWanLaiConfigBridge } from "../auth/wanLaiConfigBridge";
 
 export class VsCodeExtension {
   // Currently some of these are public so they can be used in testing (test/test-suites)
 
   private configHandler: ConfigHandler;
   private extensionContext: vscode.ExtensionContext;
+  private readonly authModule: AuthModule | undefined;
   private ide: VsCodeIde;
   private ideUtils: VsCodeIdeUtils;
   private consoleView: ContinueConsoleWebviewViewProvider;
@@ -169,7 +177,11 @@ export class VsCodeExtension {
     }
   }
 
-  constructor(context: vscode.ExtensionContext) {
+  constructor(
+    context: vscode.ExtensionContext,
+    authModule?: AuthModule,
+  ) {
+    this.authModule = authModule;
     this.editDecorationManager = new EditDecorationManager(context);
 
     let resolveWebviewProtocol: any = undefined;
@@ -278,9 +290,25 @@ export class VsCodeExtension {
       this,
     );
 
+    if (this.authModule) {
+      this.attachAuthWebviewProtocol(this.sidebar.webviewProtocol);
+    }
+
     this.core = new Core(inProcessMessenger, this.ide);
     this.configHandler = this.core.configHandler;
     resolveConfigHandler?.(this.configHandler);
+
+    if (this.authModule) {
+      attachWanLaiConfigBridge({
+        configHandler: this.configHandler,
+        authService: this.authModule.authService,
+        runtimeClient: this.authModule.runtimeApiClient,
+        deviceInfo: this.authModule.deviceInfo,
+        oauthConfig: this.authModule.oauthConfig,
+        ide: this.ide,
+        llmLogger: this.core.llmLogger,
+      });
+    }
 
     void this.configHandler.loadConfig();
 
@@ -637,6 +665,53 @@ export class VsCodeExtension {
 
   registerCustomContextProvider(contextProvider: IContextProvider) {
     this.configHandler.registerCustomContextProvider(contextProvider);
+  }
+
+  private attachAuthWebviewProtocol(
+    webviewProtocol: VsCodeWebviewProtocol,
+  ): void {
+    const authModule = this.authModule;
+    if (!authModule) {
+      return;
+    }
+
+    const pushStatus = () => {
+      void webviewProtocol.request(
+        "auth:status",
+        buildAuthStatusPayload(authModule.authService),
+      );
+    };
+
+    webviewProtocol.on("auth:get_status", () =>
+      buildAuthStatusPayload(authModule.authService),
+    );
+
+    webviewProtocol.on("auth:login", async () => {
+      const result = await runWanLaiLogin(authModule);
+      void notifyWanLaiLoginOutcome(result);
+      if (result.outcome === "success") {
+        return;
+      }
+      void webviewProtocol.request("auth:login_failed", {
+        reason:
+          result.outcome === "cancelled" ? "cancelled" : "login_failed",
+        message:
+          result.message ??
+          (result.outcome === "cancelled"
+            ? "已取消登录"
+            : "万来登录失败，请重试"),
+      });
+    });
+
+    webviewProtocol.on("auth:logout", async () => {
+      await vscode.commands.executeCommand("wanlaiide.auth.logout");
+    });
+
+    authModule.authService.onStatusChange.subscribe(() => {
+      pushStatus();
+    });
+
+    pushStatus();
   }
 
   public activateNextEdit() {
